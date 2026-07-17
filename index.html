@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>El Cuaderno del Guardián</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="app-header">
+      <div class="eyebrow">Herramienta de Mesa D&D 5ª Edición 2024</div>
+      <h1 class="title">El Cuaderno del Guardián</h1>
+      <div class="rule"><span class="diamond"></span></div>
+      <p class="subtitle">Genera PNJ, personajes y monstruos ajustados a tu mesa con las tiradas justas de azar y las que tú decidas.</p>
+    </header>
+
+    <nav class="tabs">
+      <button class="tab-btn active" data-tab="npc">PNJ</button>
+      <button class="tab-btn" data-tab="pc">Personaje</button>
+      <button class="tab-btn" data-tab="monster">Monstruo</button>
+      <button class="tab-btn" data-tab="saved">Guardados</button>
+    </nav>
+
+    <section class="panel active" id="panel-npc">
+      <div class="grid">
+        <div class="form-card" id="npc-form">
+          <h2>Forjar un PNJ</h2>
+          <p class="hint">Eliges raza y oficio; el resto cae por azar dentro de las reglas.</p>
+
+          <div class="field">
+            <label>Raza</label>
+            <select id="npc-race"></select>
+          </div>
+
+          <div class="field">
+            <label>Oficio</label>
+            <select id="npc-job"></select>
+          </div>
+
+          <div class="field">
+            <label>Nivel medio de tus jugadores para tiendas y trato</label>
+            <input type="number" id="npc-partylevel" min="1" max="20" value="3" />
+          </div>
+
+          <button class="seal-btn" id="npc-generate"><span class="seal-icon"></span> Generar PNJ</button>
+        </div>
+
+        <div class="result-area" id="npc-result">
+          <div class="empty-state">Aún no has forjado a nadie. Elige raza y oficio, y dale al sello.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-pc">
+      <div class="grid">
+        <div class="form-card" id="pc-form">
+          <h2>Crear un Personaje</h2>
+          <p class="hint">Deja en Aleatorio lo que quieras que decida el destino. Especifica el resto.</p>
+
+          <div class="field">
+            <label>Nivel</label>
+            <input type="number" id="pc-level" min="1" max="20" placeholder="Aleatorio 1-20" />
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label>Especie</label>
+              <select id="pc-race"></select>
+            </div>
+            <div class="field">
+              <label>Trasfondo</label>
+              <select id="pc-background"></select>
+            </div>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label>Clase</label>
+              <select id="pc-class"></select>
+            </div>
+            <div class="field">
+              <label>Subclase si nivel 3+</label>
+              <select id="pc-subclass"></select>
+            </div>
+          </div>
+
+          <fieldset>
+            <legend>Estadísticas</legend>
+            <div class="radio-row">
+              <label><input type="radio" name="statmethod" value="random" checked /> Aleatorio 4d6, descarta el menor</label>
+              <label><input type="radio" name="statmethod" value="standard" /> Array estándar 15,14,13,12,10,8</label>
+              <label><input type="radio" name="statmethod" value="manual" /> Especificar manualmente</label>
+            </div>
+
+            <div class="stat-grid" id="pc-manual-stats" style="display:none">
+              <div><label>Fuerza</label><input type="number" id="m-str" value="10" min="1" max="30"></div>
+              <div><label>Destreza</label><input type="number" id="m-dex" value="10" min="1" max="30"></div>
+              <div><label>Constitución</label><input type="number" id="m-con" value="10" min="1" max="30"></div>
+              <div><label>Inteligencia</label><input type="number" id="m-int" value="10" min="1" max="30"></div>
+              <div><label>Sabiduría</label><input type="number" id="m-wis" value="10" min="1" max="30"></div>
+              <div><label>Carisma</label><input type="number" id="m-cha" value="10" min="1" max="30"></div>
+            </div>
+          </fieldset>
+
+          <button class="seal-btn" id="pc-generate"><span class="seal-icon"></span> Generar Personaje</button>
+        </div>
+
+        <div class="result-area" id="pc-result">
+          <div class="empty-state">Ningún héroe en el tintero todavía. Rellena lo que te importe y genera.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-monster">
+      <div class="grid">
+        <div class="form-card" id="monster-form">
+          <h2>Invocar un Monstruo</h2>
+          <p class="hint">Parte de un monstruo existente y ajústalo a tu mesa, o deja que algo nuevo emerja de la niebla.</p>
+
+          <fieldset>
+            <legend>Origen</legend>
+            <div class="radio-row">
+              <label><input type="radio" name="monmode" value="existing" checked /> Monstruo existente ajustado a mis jugadores</label>
+              <label><input type="radio" name="monmode" value="random" /> Completamente aleatorio</label>
+            </div>
+          </fieldset>
+
+          <div class="field" id="mon-existing-field">
+            <label>Monstruo</label>
+            <select id="mon-base"></select>
+          </div>
+
+          <div class="row2">
+            <div class="field">
+              <label>Nº de jugadores</label>
+              <input type="number" id="mon-players" min="1" max="10" value="4" />
+            </div>
+            <div class="field">
+              <label>Nivel medio del grupo</label>
+              <input type="number" id="mon-level" min="1" max="20" value="5" />
+            </div>
+          </div>
+
+          <fieldset id="mon-scale-fieldset">
+            <legend>Método de ajuste</legend>
+            <div class="radio-row">
+              <label><input type="radio" name="scalemethod" value="budget" checked /> Presupuesto de encuentro calcula cuántos</label>
+              <label><input type="radio" name="scalemethod" value="cr" /> Escalar estadísticas a un CR objetivo</label>
+            </div>
+          </fieldset>
+
+          <div class="field" id="mon-difficulty-field">
+            <label>Dificultad deseada</label>
+            <select id="mon-difficulty">
+              <option value="easy">Fácil</option>
+              <option value="medium" selected>Media</option>
+              <option value="hard">Difícil</option>
+              <option value="deadly">Mortal</option>
+            </select>
+          </div>
+
+          <div class="field" id="mon-cr-field" style="display:none">
+            <label>CR objetivo opcional (vacío = nivel del grupo)</label>
+            <input type="text" id="mon-target-cr" placeholder="ej. 1/2, 3, 10" />
+          </div>
+
+          <button class="seal-btn" id="mon-generate"><span class="seal-icon"></span> Generar Monstruo</button>
+        </div>
+
+        <div class="result-area" id="mon-result">
+          <div class="empty-state">Ninguna bestia acecha aún. Configura el encuentro y rómpela el sello al frasco.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-saved">
+      <div class="saved-toolbar">
+        <span class="badge" id="saved-backend-badge">Comprobando almacenamiento…</span>
+        <button class="file-btn" id="export-json">Exportar JSON</button>
+        <label class="file-btn">Importar JSON<input type="file" accept="application/json" id="import-file"></label>
+      </div>
+
+      <div class="saved-columns">
+        <div>
+          <h2>PNJ guardados</h2>
+          <div class="saved-list" id="saved-list-npc"></div>
+        </div>
+        <div>
+          <h2>Personajes guardados</h2>
+          <div class="saved-list" id="saved-list-pc"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="app-footer">
+      Herramienta de apoyo para el Dungeon Master; verifica siempre los casos importantes con el manual.
+    </footer>
+  </div>
+
+  <script src="js/data.js"></script>
+  <script src="js/utils.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/npc.js"></script>
+  <script src="js/pc.js"></script>
+  <script src="js/monster.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
