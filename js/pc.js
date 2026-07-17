@@ -31,14 +31,15 @@ function pickSpellsForCaster(info, level) {
   const known = [];
   const maxLvl = info.maxSpellLevel || 1;
   const numKnownIsh = info.type === 'known' ? Math.min(2 + level, 15) : Math.min(2 + level, 15);
+  const spellsSet = new Set();
 
-  for (let i = 0; i < numKnownIsh; i++) {
+  while (spellsSet.size < numKnownIsh) {
     const lvl = 1 + rnd(maxLvl);
     const pool = SPELLPOOL[lvl] || [];
-    if (pool.length) known.push(pick(pool));
+    if (!pool.length) break; 
+    spellsSet.add(pick(pool));
   }
-
-  return { cantrips, spells: [...new Set(known)] };
+  return { cantrips, spells: [...spellsSet] };
 }
 
 function buildPCData(opts) {

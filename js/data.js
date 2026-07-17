@@ -71,7 +71,7 @@ const CLASSES = [
 ];
 
 /* prioridad completa de las 6 características por clase, de más a menos relevante para el reparto de estadísticas */
-const STAT_PRIORITY = {
+const STATPRIORITY = {
   barbaro:   ['str','con','dex','wis','cha','int'],
   bardo:     ['cha','dex','con','wis','int','str'],
   clerigo:   ['wis','con','str','cha','dex','int'],
@@ -87,14 +87,14 @@ const STAT_PRIORITY = {
 };
 
 /* ---------- spell slot tables ---------- */
-const FULL_CASTER_SLOTS = {
+const FULLCASTERSLOTS = {
   1:[2,0,0,0,0,0,0,0,0], 2:[3,0,0,0,0,0,0,0,0], 3:[4,2,0,0,0,0,0,0,0], 4:[4,3,0,0,0,0,0,0,0],
   5:[4,3,2,0,0,0,0,0,0], 6:[4,3,3,0,0,0,0,0,0], 7:[4,3,3,1,0,0,0,0,0], 8:[4,3,3,2,0,0,0,0,0],
   9:[4,3,3,3,1,0,0,0,0], 10:[4,3,3,3,2,0,0,0,0], 11:[4,3,3,3,2,1,0,0,0], 12:[4,3,3,3,2,1,0,0,0],
   13:[4,3,3,3,2,1,1,0,0], 14:[4,3,3,3,2,1,1,0,0], 15:[4,3,3,3,2,1,1,1,0], 16:[4,3,3,3,2,1,1,1,0],
   17:[4,3,3,3,2,1,1,1,1], 18:[4,3,3,3,3,1,1,1,1], 19:[4,3,3,3,3,2,1,1,1], 20:[4,3,3,3,3,2,2,1,1],
 };
-const HALF_CASTER_SLOTS = {
+const HALFCASTERSLOTS = {
   1:[0,0,0,0,0], 2:[2,0,0,0,0], 3:[3,0,0,0,0], 4:[3,0,0,0,0], 5:[4,2,0,0,0], 6:[4,2,0,0,0],
   7:[4,3,0,0,0], 8:[4,3,0,0,0], 9:[4,3,2,0,0], 10:[4,3,2,0,0], 11:[4,3,3,0,0], 12:[4,3,3,0,0],
   13:[4,3,3,1,0], 14:[4,3,3,1,0], 15:[4,3,3,2,0], 16:[4,3,3,2,0], 17:[4,3,3,3,1], 18:[4,3,3,3,1],
@@ -324,7 +324,7 @@ const OFICIOS = [
 ];
 
 /* ---------- SHOP INVENTORY POOLS by tier (party level) ---------- */
-const SHOP_MUNDANE = {
+const SHOPMUNDANE = {
   armeria:[['Espada larga','15 po'],['Hacha de mano','5 po'],['Cota de malla','75 po'],['Escudo','10 po'],['Yelmo de acero','—'],['20 flechas','1 po'],['Herraduras','2 po']],
   pociones:[['Poción de curación (2d4+2)','50 po'],['Antitóxico','50 po'],['Aceite','1 po'],['Vial vacío','1 po'],['Componentes de alquimia (kit)','50 po']],
   templo:[['Símbolo sagrado','5 po'],['Incienso bendito','1 po'],['Poción de curación','50 po'],['Aceite santo','25 po'],['Kit de sanador','5 po']],
@@ -339,7 +339,7 @@ const SHOP_MUNDANE = {
 };
 
 /* magic item pools by rarity, tagged to shop types */
-const MAGIC_POOL = {
+const MAGICPOOL = {
   common:{
     pociones:['Poción de curación','Poción de escalada','Poción de resistencia al ácido','Poción de aliento de agua','Poción de trepar como araña (menor)','Aceite de afilado','Poción de resistencia al frío','Tónico de resistencia menor'],
     armeria:['Arma +0 con grabado élfico (decorativa)','Munición +1 (lote pequeño)','Piedra de afilar encantada','Correa de sujeción reforzada'],
@@ -398,7 +398,7 @@ const MAGIC_POOL = {
 };
 
 /* ---------- CR TABLE (2024 DMG-style guide, AC/HP/Attack/Damage/DC by CR) ---------- */
-const CR_TABLE = [
+const CRTABLE = [
   {cr:'0',   crn:0,    prof:2, ac:13, hp:[1,6],     atk:3,  dmg:[0,1],    dc:13, xp:10},
   {cr:'1/8', crn:0.125,prof:2, ac:13, hp:[7,35],    atk:3,  dmg:[2,3],    dc:13, xp:25},
   {cr:'1/4', crn:0.25, prof:2, ac:13, hp:[36,49],   atk:3,  dmg:[4,5],    dc:13, xp:50},
@@ -428,7 +428,7 @@ const CR_TABLE = [
   {cr:'24',  crn:24,   prof:7, ac:19, hp:[536,580], atk:12, dmg:[195,212],dc:21, xp:62000},
 ];
 
-const XP_THRESHOLDS = { //  easy, medium, hard, deadly
+const XPTHRESHOLDS = { //  easy, medium, hard, deadly
   1:[25,50,75,100], 2:[50,100,150,200], 3:[75,150,225,400], 4:[125,250,375,500],
   5:[250,500,750,1100], 6:[300,600,900,1400], 7:[350,750,1100,1700], 8:[450,900,1400,2100],
   9:[550,1100,1600,2400], 10:[600,1200,1900,2800], 11:[800,1600,2400,3600], 12:[1000,2000,3000,4500],

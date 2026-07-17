@@ -156,10 +156,51 @@ function initUI() {
     if (file) importAllDataFromFile(file);
   });
 
+  filterSpells();
   refreshSubclassOptions();
   refreshMonsterModeUI();
   refreshSavedList();
   refreshCustomSpellsCache();
+}
+
+function refreshSubclassOptions() {
+  const classSelect = document.getElementById('pc-class');
+  const subSelect = document.getElementById('pc-subclass');
+  const classId = classSelect.value;
+  const klass = CLASSES.find(c => c.id === classId);
+  
+  subSelect.innerHTML = ''; // Limpiar opciones anteriores
+  
+  if (klass && klass.subclasses) {
+    klass.subclasses.forEach(sub => {
+      const opt = document.createElement('option');
+      opt.value = sub;
+      opt.textContent = sub;
+      subSelect.appendChild(opt);
+    });
+  }
+}
+
+function filterSpells() {
+  const input = document.getElementById('spell-search').value.toLowerCase();
+  const listEl = document.getElementById('spell-list');
+  
+  // Aplanamos todos los hechizos de todos los niveles en un solo array
+  const allSpells = Object.values(SPELL_POOL).flat();
+  
+  const filtered = allSpells.filter(s => 
+    s.name.toLowerCase().includes(input) || 
+    s.desc.toLowerCase().includes(input)
+  );
+
+  listEl.innerHTML = filtered.length > 0 
+    ? filtered.map(s => `
+        <div class="spell-card">
+          <div class="spell-name">${s.name}</div>
+          <div class="spell-desc">${s.desc}</div>
+        </div>
+      `).join('')
+    : '<div class="empty-state">No se encontraron hechizos.</div>';
 }
 
 document.addEventListener('DOMContentLoaded', initUI);

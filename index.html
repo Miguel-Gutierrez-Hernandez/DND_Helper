@@ -22,6 +22,7 @@
       <button class="tab-btn active" data-tab="npc">PNJ</button>
       <button class="tab-btn" data-tab="pc">Personaje</button>
       <button class="tab-btn" data-tab="monster">Monstruo</button>
+      <button class="tab-btn" data-tab="spells">Hechizos</button>
       <button class="tab-btn" data-tab="saved">Guardados</button>
     </nav>
 
@@ -173,6 +174,18 @@
 
         <div class="result-area" id="mon-result">
           <div class="empty-state">Ninguna bestia acecha aún. Configura el encuentro y rómpela el sello al frasco.</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="panel-spells">
+      <div class="form-card" style="max-width: 800px; margin: 0 auto;">
+        <h2>Biblioteca de Hechizos</h2>
+        <div class="field">
+          <input type="text" id="spell-search" placeholder="Buscar por nombre o efecto..." onkeyup="filterSpells()">
+        </div>
+        <div id="spell-list" class="spell-grid">
+          
         </div>
       </div>
     </section>
