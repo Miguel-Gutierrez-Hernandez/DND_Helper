@@ -161,6 +161,113 @@ async function refreshWorkshopLists() {
     </div>`).join('') : '<div class="empty-state">Ningún hechizo personalizado todavía.</div>';
 }
 
+/* -------- adjuntar objetos del catálogo a PNJ / PJ -------- */
+function renderItemPicker(pickerId, addFnName) {
+  const catalog = window.CUSTOMITEMSCACHE || [];
+  if (!catalog.length) {
+    return `<div class="note-box">Aún no tienes objetos en el Taller. Crea uno en la pestaña «Taller» para poder adjuntarlo aquí.</div>`;
+  }
+  const options = catalog.map(it => `<option value="${it.id}">${it.name} · ${RARITY_ES_WORKSHOP[it.rarity] || it.rarity}</option>`).join('');
+  return `
+    <div class="row2" style="align-items:end;">
+      <div class="field" style="margin-bottom:0;">
+        <label>Objeto del catálogo</label>
+        <select id="${pickerId}">${options}</select>
+      </div>
+      <button class="ghost-btn" style="height:38px;" onclick="${addFnName}(document.getElementById('${pickerId}').value)">+ Añadir objeto</button>
+    </div>`;
+}
+
+/* -------- bonos mecánicos de los objetos -------- */
+/* extrae el primer número con signo del texto de "bonus" (p.ej. "+1 a impactar y dañar" -> 1) */
+function parseItemBonusNumber(str) {
+  if (!str) return 0;
+  const m = String(str).match(/[+-]\s*\d+/);
+  if (!m) return 0;
+  return parseInt(m[0].replace(/\s+/g, ''), 10);
+}
+
+/* suma los bonos de todos los objetos adjuntos, repartidos por tipo:
+   Arma -> ataque y daño | Armadura/Escudo -> CA | Objeto maravilloso -> sin efecto numérico automático */
+function computeItemBonuses(items) {
+  const result = { ac: 0, atk: 0, dmg: 0 };
+  (items || []).forEach(it => {
+    const n = parseItemBonusNumber(it.bonus);
+    if (!n) return;
+    if (it.type === 'Armadura' || it.type === 'Escudo') result.ac += n;
+    else if (it.type === 'Arma') { result.atk += n; result.dmg += n; }
+  });
+  return result;
+}
+
+/* CA final ya con el bono de objetos aplicado, con desglose visual si hay bono */
+function acWithItemsLabel(baseAc, items) {
+  const bonus = computeItemBonuses(items);
+  const total = baseAc + bonus.ac;
+  if (!bonus.ac) return `${total}`;
+  return `${total} <span style="opacity:.6;font-weight:400;">(${baseAc} ${bonus.ac > 0 ? '+' : ''}${bonus.ac} por objetos)</span>`;
+}
+
+/* línea-resumen de modificadores por objetos (ataque/daño), vacía si no hay ninguno */
+function itemBonusSummaryLine(items) {
+  const b = computeItemBonuses(items);
+  const parts = [];
+  if (b.atk) parts.push(`Ataque ${b.atk > 0 ? '+' : ''}${b.atk}`);
+  if (b.dmg) parts.push(`Daño ${b.dmg > 0 ? '+' : ''}${b.dmg}`);
+  if (!parts.length) return '';
+  return `<div class="note-box">Modificadores por objetos: ${parts.join(' · ')}</div>`;
+}
+
+function renderAttachedItems(items, removeFnName) {
+  if (!items || !items.length) return '<div class="note-box">Sin objetos adjuntos todavía.</div>';
+  return `<ul class="clean">${items.map((it, idx) => `
+    <li><b>${it.name}</b> (${it.type} · ${RARITY_ES_WORKSHOP[it.rarity] || it.rarity}${it.bonus ? ' · ' + it.bonus : ''}) — ${it.ability}
+      <button class="ghost-btn light" style="margin-left:8px;padding:2px 8px;" onclick="${removeFnName}(${idx})">Quitar</button>
+    </li>`).join('')}</ul>`;
+}
+
+function renderCurrentNPC() {
+  if (!lastNPCData) return;
+  const opts = lastNPCData.savedAt ? { hideSave: true, showDelete: true } : {};
+  document.getElementById('npc-result').innerHTML = npcDataToHtml(lastNPCData, opts);
+}
+async function addItemToNPC(itemId) {
+  if (!lastNPCData || !itemId) return;
+  const item = (window.CUSTOMITEMSCACHE || []).find(i => i.id === itemId);
+  if (!item) return;
+  if (!lastNPCData.items) lastNPCData.items = [];
+  lastNPCData.items.push(item);
+  if (lastNPCData.savedAt) { lastNPCData.savedAt = Date.now(); await saveNPCData(lastNPCData); refreshSavedList(); }
+  renderCurrentNPC();
+}
+async function removeItemFromNPC(idx) {
+  if (!lastNPCData || !lastNPCData.items) return;
+  lastNPCData.items.splice(idx, 1);
+  if (lastNPCData.savedAt) { lastNPCData.savedAt = Date.now(); await saveNPCData(lastNPCData); refreshSavedList(); }
+  renderCurrentNPC();
+}
+
+function renderCurrentPC() {
+  if (!lastPCData) return;
+  const opts = lastPCData.savedAt ? { hideSave: true, showDelete: true } : {};
+  document.getElementById('pc-result').innerHTML = pcDataToHtml(lastPCData, opts);
+}
+async function addItemToPC(itemId) {
+  if (!lastPCData || !itemId) return;
+  const item = (window.CUSTOMITEMSCACHE || []).find(i => i.id === itemId);
+  if (!item) return;
+  if (!lastPCData.items) lastPCData.items = [];
+  lastPCData.items.push(item);
+  if (lastPCData.savedAt) { lastPCData.savedAt = Date.now(); await savePCData(lastPCData); refreshSavedList(); }
+  renderCurrentPC();
+}
+async function removeItemFromPC(idx) {
+  if (!lastPCData || !lastPCData.items) return;
+  lastPCData.items.splice(idx, 1);
+  if (lastPCData.savedAt) { lastPCData.savedAt = Date.now(); await savePCData(lastPCData); refreshSavedList(); }
+  renderCurrentPC();
+}
+
 function initWorkshopUI() {
   populateWorkshopCrSelect();
 

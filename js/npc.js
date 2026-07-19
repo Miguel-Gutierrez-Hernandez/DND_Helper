@@ -33,7 +33,7 @@ function renderShop(job, partyLevel, stock) {
     <table class="shop-table">
       <thead><tr><th>Artículo</th><th>Precio</th></tr></thead>
       <tbody>
-        ${mundane.map(n => `<tr><td>${n.item || n}</td><td>${n.price || ''}</td></tr>`).join('')}
+        ${mundane.map(n => `<tr><td>${n[0]}</td><td>${n[1]}</td></tr>`).join('')}
       </tbody>
     </table>
   `;
@@ -116,7 +116,8 @@ function buildNPCData(raceId, jobId, partyLevel) {
     atkBonus,
     shopType: job.shop,
     partyLevel,
-    shopStock
+    shopStock,
+    items: []
   };
 }
 
@@ -145,7 +146,7 @@ function npcDataToHtml(data, options = {}) {
       </div>
 
       <div class="stat-line">
-        <span><b>CA</b> ${data.ac}</span>
+        <span><b>CA</b> ${acWithItemsLabel(data.ac, data.items)}</span>
         <span><b>PG</b> ${data.hp}</span>
         <span><b>Velocidad</b> ${data.speed} m</span>
         <span><b>Bono comp.</b> ${modStr(data.pb)}</span>
@@ -161,10 +162,15 @@ function npcDataToHtml(data, options = {}) {
       <div class="section-title">Equipo</div>
       <ul class="clean">
         <li>Armadura: ${data.armorHint}</li>
-        <li>Arma: ${data.weaponHint} (${modStr(data.atkBonus)} para golpear, aprox.)</li>
+        <li>Arma: ${data.weaponHint} (${modStr(data.atkBonus + computeItemBonuses(data.items).atk)} para golpear, aprox.)</li>
       </ul>
+      ${itemBonusSummaryLine(data.items)}
 
       ${data.shopType ? renderShop(OFICIOS.find(o => o.id === data.jobId), data.partyLevel, data.shopStock) : '<div class="note-box">Este oficio no lleva tienda.</div>'}
+
+      <div class="section-title">Objetos adjuntos</div>
+      ${renderAttachedItems(data.items, 'removeItemFromNPC')}
+      ${renderItemPicker('npc-item-picker-select', 'addItemToNPC')}
 
       <div class="sheet-actions">
         ${regenBtn}

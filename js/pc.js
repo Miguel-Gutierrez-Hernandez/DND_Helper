@@ -70,9 +70,8 @@ function buildPCData(opts) {
   const dexMod = abilityMod(stats.dex);
 
   let ac = 10 + dexMod;
-  if (klass.armor.includes('pesada')) ac = 16;
-  else if (klass.armor.includes('escudo') && klass.armor.includes('media')) ac = 13 + Math.min(dexMod, 2);
-  else if (klass.armor.includes('media')) ac = 13 + Math.min(dexMod, 2);
+  if (klass.armor.includes('pesada')) ac = 16 + (klass.armor.includes('escudo') ? 2 : 0);
+  else if (klass.armor.includes('media')) ac = 13 + Math.min(dexMod, 2) + (klass.armor.includes('escudo') ? 2 : 0);
   else if (klass.armor.includes('ligera')) ac = 11 + dexMod;
   else if (klass.armor.includes('Defensa sin Armadura')) {
     const secondMod = klass.id === 'barbaro' ? abilityMod(stats.con) : abilityMod(stats.wis);
@@ -85,6 +84,13 @@ function buildPCData(opts) {
   const skills = pickN(['Percepción', 'Perspicacia', 'Persuasión', 'Engaño', 'Intimidación', 'Investigación', 'Historia', 'Naturaleza', 'Medicina', 'Sigilo', 'Juego de Manos', 'Trato con Animales', 'Supervivencia', 'Arcanos', 'Atletismo', 'Acrobacias'], 3);
   const name = genName();
 
+  let subclassName = opts.subclass || null;
+  if (level >= 3) {
+    if (!subclassName || !klass.subclasses.includes(subclassName)) subclassName = pick(klass.subclasses);
+  } else {
+    subclassName = null;
+  }
+
   return {
     id: `pc-${Date.now()}-${rnd(100000)}`,
     savedAt: null,
@@ -95,7 +101,7 @@ function buildPCData(opts) {
     backgroundName: background.name,
     classId: klass.id,
     className: klass.name,
-    subclassName: opts.subclass || null,
+    subclassName,
     level,
     stats,
     hp,
@@ -111,7 +117,8 @@ function buildPCData(opts) {
     armor: klass.armor,
     subclassList: klass.subclasses,
     casterInfo,
-    spells
+    spells,
+    items: []
   };
 }
 
@@ -141,7 +148,7 @@ function pcDataToHtml(data, options = {}) {
       </div>
 
       <div class="stat-line">
-        <span><b>CA</b> ${data.ac}</span>
+        <span><b>CA</b> ${acWithItemsLabel(data.ac, data.items)}</span>
         <span><b>PG</b> ${data.hp}</span>
         <span><b>Dado de golpe</b> d${data.hitDie}</span>
         <span><b>Velocidad</b> ${data.speed} m</span>
@@ -177,6 +184,11 @@ function pcDataToHtml(data, options = {}) {
   }
 
   html += `
+      <div class="section-title">Objetos adjuntos</div>
+      ${renderAttachedItems(data.items, 'removeItemFromPC')}
+      ${itemBonusSummaryLine(data.items)}
+      ${renderItemPicker('pc-item-picker-select', 'addItemToPC')}
+
       ${savedTag}
       <div class="sheet-actions">
         ${regenBtn}

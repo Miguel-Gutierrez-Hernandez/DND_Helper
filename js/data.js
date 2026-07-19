@@ -436,7 +436,6 @@ const XPTHRESHOLDS = { //  easy, medium, hard, deadly
   17:[2000,3900,5900,8800], 18:[2100,4200,6300,9500], 19:[2400,4900,7300,10900], 20:[2800,5700,8500,12700],
 };
 
-const DIFF_INDEX = {easy:0,medium:1,hard:2,deadly:3};
 
 const MONSTERS = [
   {id:'goblin', name:'Trasgo', type:'Humanoide diminuto (goblinoide)', cr:'1/4', traits:['Fuga Ágil (retirada como bonus)'], attackName:'Cimitarra / Arco corto'},
@@ -461,14 +460,8 @@ const MONSTERS = [
   {id:'liche', name:'Liche', type:'No-muerto mediano (conjurador supremo)', cr:'21', traits:['Conjuros de alto nivel','Filacteria (renace)'], attackName:'Toque paralizante / Conjuro'},
 ];
 
-const RANDOM_TYPES = ['Bestia','Humanoide','No-muerto','Monstruosidad','Aberración','Elemental','Fey','Gigante','Dragón menor','Constructo','Demonio menor'];
-const RANDOM_ADJ = ['Sombrío','Escamoso','Espinado','Corrompido','Errante','Aullador','Ceniciento','Glacial','Bilioso','Tembloroso','Carmesí','Fangoso','Espectral','Rugiente'];
-const RANDOM_NOUN = ['Acechador','Devorador','Guardián','Horror','Centinela','Segador','Rondador','Azote','Engendro','Espectro','Cazador'];
 
 /* ---------- name generator ---------- */
-const NAME_SYL_START = ['Bar','Tor','Kel','Fen','Osw','Wyl','Gar','Dor','Ael','Ilv','Bren','Cor','Dris','Val','Mira','Sela','Nia','Rhys','Ysa','Tha'];
-const NAME_SYL_MID = ['an','en','or','ir','ath','on','el','ar','ynn','os','wen','dric','mund','lyn'];
-const NAME_SYL_END = ['dor','ric','wyn','as','on','ith','mar','ald','iel','ora','sen','thir'];
 
 const DIFFINDEX = {
   easy: 0,

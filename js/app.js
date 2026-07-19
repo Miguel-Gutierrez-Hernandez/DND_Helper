@@ -178,17 +178,16 @@ function refreshSubclassOptions() {
   const subSelect = document.getElementById('pc-subclass');
   const classId = classSelect.value;
   const klass = CLASSES.find(c => c.id === classId);
-  
-  subSelect.innerHTML = ''; // Limpiar opciones anteriores
-  
-  if (klass && klass.subclasses) {
-    klass.subclasses.forEach(sub => {
-      const opt = document.createElement('option');
-      opt.value = sub;
-      opt.textContent = sub;
-      subSelect.appendChild(opt);
-    });
-  }
+
+  subSelect.innerHTML = '<option value="">Aleatoria</option>';
+
+  const subclasses = klass ? klass.subclasses : [...new Set(CLASSES.flatMap(c => c.subclasses))];
+  subclasses.forEach(sub => {
+    const opt = document.createElement('option');
+    opt.value = sub;
+    opt.textContent = sub;
+    subSelect.appendChild(opt);
+  });
 }
 
 function filterSpells() {
