@@ -84,11 +84,19 @@ async function importAllDataFromFile(file) {
     }
   }
 
-  await refreshCustomSpellsCache();
+  await Promise.all([refreshCustomSpellsCache(), refreshCustomMonstersCache(), refreshCustomItemsCache()]);
+  await populateMonsterSelect();
   refreshSavedList();
+  if (document.getElementById('workshop-monster-list')) refreshWorkshopLists();
+  if (typeof filterSpells === 'function') filterSpells();
 }
 
-function initUI() {
+async function populateMonsterSelect() {
+  const all = getAllMonstersMerged();
+  fillSelect(document.getElementById('mon-base'), all, m => m.id, m => `${m.name} · CR ${m.cr}${m.custom ? ' (personalizado)' : ''}`);
+}
+
+async function initUI() {
   document.querySelectorAll('.tab-btn').forEach(btn => {
     btn.addEventListener('click', () => activateTab(btn.dataset.tab));
   });
@@ -98,7 +106,9 @@ function initUI() {
   fillSelect(document.getElementById('pc-race'), SPECIES, s => s.id, s => s.name, true);
   fillSelect(document.getElementById('pc-background'), BACKGROUNDS, b => b.id, b => b.name, true);
   fillSelect(document.getElementById('pc-class'), CLASSES, c => c.id, c => c.name, true);
-  fillSelect(document.getElementById('mon-base'), MONSTERS, m => m.id, m => `${m.name} · CR ${m.cr}`);
+
+  await Promise.all([refreshCustomMonstersCache(), refreshCustomItemsCache(), refreshCustomSpellsCache()]);
+  await populateMonsterSelect();
 
   document.getElementById('npc-generate').addEventListener('click', () => {
     generateNPC(
@@ -160,7 +170,7 @@ function initUI() {
   refreshSubclassOptions();
   refreshMonsterModeUI();
   refreshSavedList();
-  refreshCustomSpellsCache();
+  initWorkshopUI();
 }
 
 function refreshSubclassOptions() {
@@ -185,8 +195,8 @@ function filterSpells() {
   const input = document.getElementById('spell-search').value.toLowerCase();
   const listEl = document.getElementById('spell-list');
   
-  // Aplanamos todos los hechizos de todos los niveles en un solo array
-  const allSpells = Object.values(SPELL_POOL).flat();
+  // Aplanamos todos los hechizos de todos los niveles (base + personalizados) en un solo array
+  const allSpells = getAllSpellsFlatMerged();
   
   const filtered = allSpells.filter(s => 
     s.name.toLowerCase().includes(input) || 
@@ -196,7 +206,7 @@ function filterSpells() {
   listEl.innerHTML = filtered.length > 0 
     ? filtered.map(s => `
         <div class="spell-card">
-          <div class="spell-name">${s.name}</div>
+          <div class="spell-name">${s.name} <span style="font-weight:400;font-size:11px;opacity:.65;">· Nv${s.level}${s.custom ? ' · personalizado' : ''}</span></div>
           <div class="spell-desc">${s.desc}</div>
         </div>
       `).join('')

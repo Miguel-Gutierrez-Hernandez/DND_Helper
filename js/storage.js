@@ -88,3 +88,9 @@ async function deleteCustomSpell(id) { return storeDelete('cspell', id); }
 async function refreshCustomSpellsCache() {
   window.CUSTOMSPELLSCACHE = await listCustomSpells();
 }
+async function refreshCustomMonstersCache() {
+  window.CUSTOMMONSTERSCACHE = await listCustomMonsters();
+}
+async function refreshCustomItemsCache() {
+  window.CUSTOMITEMSCACHE = await listCustomItems();
+}

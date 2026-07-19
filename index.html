@@ -23,6 +23,7 @@
       <button class="tab-btn" data-tab="pc">Personaje</button>
       <button class="tab-btn" data-tab="monster">Monstruo</button>
       <button class="tab-btn" data-tab="spells">Hechizos</button>
+      <button class="tab-btn" data-tab="taller">Taller</button>
       <button class="tab-btn" data-tab="saved">Guardados</button>
     </nav>
 
@@ -190,6 +191,131 @@
       </div>
     </section>
 
+    <section class="panel" id="panel-taller">
+      <p class="hint" style="text-align:center;margin-bottom:22px;">Crea tu propio contenido: monstruos, objetos mágicos y hechizos. Se guarda igual que los PNJ y personajes, y los monstruos y hechizos aparecen automáticamente junto a los del manual.</p>
+
+      <div class="workshop-grid">
+
+        <div class="form-card" id="workshop-monster-form">
+          <h2>Monstruo personalizado</h2>
+          <p class="hint">Si no marcas estadísticas exactas, se derivan del CR elegido, igual que los monstruos del manual.</p>
+
+          <div class="field">
+            <label>Nombre</label>
+            <input type="text" id="wm-name" placeholder="p. ej. Guardián de Ceniza">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Tipo</label>
+              <input type="text" id="wm-type" placeholder="p. ej. Elemental grande">
+            </div>
+            <div class="field">
+              <label>CR</label>
+              <select id="wm-cr"></select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Nombre del ataque</label>
+            <input type="text" id="wm-attackname" placeholder="p. ej. Garras cenicientas">
+          </div>
+          <div class="field">
+            <label>Rasgos (uno por línea)</label>
+            <textarea id="wm-traits" rows="3" placeholder="Resistencia al fuego&#10;Regeneración menor"></textarea>
+          </div>
+
+          <label class="checkline">
+            <input type="checkbox" id="wm-manual-toggle">
+            <span>Definir estadísticas exactas (en vez de derivarlas del CR)</span>
+          </label>
+          <div class="stat-grid" id="wm-manual-fields" style="display:none;grid-template-columns:repeat(2,1fr);">
+            <div><label>CA</label><input type="number" id="wm-ac" placeholder="p. ej. 15"></div>
+            <div><label>PG</label><input type="number" id="wm-hp" placeholder="p. ej. 90"></div>
+            <div><label>Bono de ataque</label><input type="number" id="wm-atkbonus" placeholder="p. ej. 6"></div>
+            <div><label>Daño por asalto</label><input type="number" id="wm-dmg" placeholder="p. ej. 18"></div>
+            <div><label>CD de salvación</label><input type="number" id="wm-dc" placeholder="p. ej. 15"></div>
+          </div>
+
+          <button class="seal-btn" id="wm-add" style="--tone:#c1502f;--tone-dim:#7d3520;"><span class="seal-icon"></span> Añadir monstruo</button>
+          <div class="saved-list" id="workshop-monster-list" style="margin-top:18px;"></div>
+        </div>
+
+        <div class="form-card" id="workshop-item-form">
+          <h2>Objeto mágico personalizado</h2>
+          <p class="hint">Queda en tu catálogo, listo para futuras fichas y tiendas.</p>
+
+          <div class="field">
+            <label>Nombre</label>
+            <input type="text" id="wi-name" placeholder="p. ej. Filo del Alba Rota">
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Tipo</label>
+              <select id="wi-type">
+                <option value="Arma">Arma</option>
+                <option value="Armadura">Armadura</option>
+                <option value="Escudo">Escudo</option>
+                <option value="Objeto maravilloso">Objeto maravilloso</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>Rareza</label>
+              <select id="wi-rarity">
+                <option value="common">Común</option>
+                <option value="uncommon" selected>Poco común</option>
+                <option value="rare">Raro</option>
+                <option value="veryrare">Muy raro</option>
+                <option value="legendary">Legendario</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Bono (opcional)</label>
+            <input type="text" id="wi-bonus" placeholder="p. ej. +1 a impactar y dañar">
+          </div>
+          <div class="field">
+            <label>Habilidad especial</label>
+            <textarea id="wi-ability" rows="3" placeholder="Describe qué hace de especial este objeto"></textarea>
+          </div>
+
+          <button class="seal-btn" id="wi-add" style="--tone:#8c6fd4;--tone-dim:#5c4a8f;"><span class="seal-icon"></span> Añadir objeto</button>
+          <div class="saved-list" id="workshop-item-list" style="margin-top:18px;"></div>
+        </div>
+
+        <div class="form-card" id="workshop-spell-form">
+          <h2>Hechizo personalizado</h2>
+          <p class="hint">Aparecerá en la Biblioteca de Hechizos y podrá salir al generar personajes lanzadores.</p>
+
+          <div class="field">
+            <label>Nombre</label>
+            <input type="text" id="ws-name" placeholder="p. ej. Velo de Cenizas">
+          </div>
+          <div class="field">
+            <label>Nivel</label>
+            <select id="ws-level">
+              <option value="0">Truco (nivel 0)</option>
+              <option value="1">Nivel 1</option>
+              <option value="2">Nivel 2</option>
+              <option value="3">Nivel 3</option>
+              <option value="4">Nivel 4</option>
+              <option value="5">Nivel 5</option>
+              <option value="6">Nivel 6</option>
+              <option value="7">Nivel 7</option>
+              <option value="8">Nivel 8</option>
+              <option value="9">Nivel 9</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Qué hace</label>
+            <textarea id="ws-desc" rows="3" placeholder="Descripción breve del efecto"></textarea>
+          </div>
+
+          <button class="seal-btn" id="ws-add" style="--tone:#3f9186;--tone-dim:#2a5f58;"><span class="seal-icon"></span> Añadir hechizo</button>
+          <div class="saved-list" id="workshop-spell-list" style="margin-top:18px;"></div>
+        </div>
+
+      </div>
+    </section>
+
     <section class="panel" id="panel-saved">
       <div class="saved-toolbar">
         <span class="badge" id="saved-backend-badge">Comprobando almacenamiento…</span>
@@ -220,6 +346,7 @@
   <script src="js/npc.js"></script>
   <script src="js/pc.js"></script>
   <script src="js/monster.js"></script>
+  <script src="js/workshop.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

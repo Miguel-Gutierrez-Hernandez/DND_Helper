@@ -70,6 +70,22 @@ function buildRandomMonster(row) {
   };
 }
 
+function monsterFromBaseAsIs(base, row) {
+  const scaled = scaleMonsterToCR(base, row);
+  if (!base.manual) return scaled;
+  const m = base.manual;
+  return {
+    ...scaled,
+    ac: m.ac ?? scaled.ac,
+    hp: m.hp ?? scaled.hp,
+    hpRange: m.hp ? [m.hp, m.hp] : scaled.hpRange,
+    attackBonus: m.attackBonus ?? scaled.attackBonus,
+    dmgPerRound: m.dmgPerRound ?? scaled.dmgPerRound,
+    dmgRange: m.dmgPerRound ? [m.dmgPerRound, m.dmgPerRound] : scaled.dmgRange,
+    saveDC: m.saveDC ?? scaled.saveDC,
+  };
+}
+
 function renderMonsterSheet(mon, extra = '') {
   const html = `
     <div class="sheet">
@@ -128,7 +144,7 @@ function generateMonster(opts) {
     return;
   }
 
-  const base = MONSTERS.find(mm => mm.id === opts.baseId) || pick(MONSTERS);
+  const base = getMonsterById(opts.baseId) || pick(MONSTERS);
   const baseRow = crRowById(base.cr);
 
   if (opts.scaleMethod === 'cr') {
@@ -151,7 +167,7 @@ function generateMonster(opts) {
   }
 
   const sug = suggestedCount(players, level, opts.difficulty, baseRow.xp);
-  const mon = scaleMonsterToCR(base, baseRow);
+  const mon = monsterFromBaseAsIs(base, baseRow);
 
   renderMonsterSheet(mon, `
     <div class="section-title">Presupuesto de encuentro</div>
@@ -160,7 +176,7 @@ function generateMonster(opts) {
       <span><b>Presupuesto XP grupal</b> ${sug.totalBudget}</span>
       <span><b>XP por criatura</b> ${baseRow.xp}</span>
     </div>
-    <div class="note-box">El monstruo conserva su CR original; se ajusta la cantidad para tus jugadores.</div>
+    <div class="note-box">${base.manual ? 'Se han usado tus estadísticas propias del Taller; se ajusta la cantidad para tus jugadores.' : 'El monstruo conserva su CR original; se ajusta la cantidad para tus jugadores.'}</div>
   `);
 }
 
