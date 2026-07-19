@@ -27,7 +27,7 @@ function spellcasterInfo(klass, level) {
 
 function pickSpellsForCaster(info, level) {
   if (!info) return null;
-  const cantrips = pickN(SPELLPOOL[0], info.cantrips || 3);
+  const cantrips = pickN(SPELL_POOL[0], info.cantrips || 3).map(s => s.name);
   const known = [];
   const maxLvl = info.maxSpellLevel || 1;
   const numKnownIsh = info.type === 'known' ? Math.min(2 + level, 15) : Math.min(2 + level, 15);
@@ -35,9 +35,9 @@ function pickSpellsForCaster(info, level) {
 
   while (spellsSet.size < numKnownIsh) {
     const lvl = 1 + rnd(maxLvl);
-    const pool = SPELLPOOL[lvl] || [];
+    const pool = SPELL_POOL[lvl] || [];
     if (!pool.length) break; 
-    spellsSet.add(pick(pool));
+    spellsSet.add(pick(pool).name);
   }
   return { cantrips, spells: [...spellsSet] };
 }

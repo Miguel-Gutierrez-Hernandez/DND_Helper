@@ -11,7 +11,7 @@ let storageBackend = 'memory';
 async function storeSave(ns, data) {
   try {
     if (window.storage) {
-      const res = await window.storage.set(ns, data.id, JSON.stringify(data), false);
+      const res = await window.storage.set(ns + ':' + data.id, JSON.stringify(data), false);
       if (res) storageBackend = 'storage';
       return { ok: true, backend: 'storage' };
     }
@@ -30,12 +30,12 @@ async function storeSave(ns, data) {
 async function storeList(ns) {
   try {
     if (window.storage) {
-      const res = await window.storage.list(ns, false);
+      const res = await window.storage.list(ns + ':', false);
       if (res && res.keys) {
         const items = [];
         for (const k of res.keys) {
           try {
-            const r = await window.storage.get(ns, k, false);
+            const r = await window.storage.get(k, false);
             if (r && r.value) items.push(JSON.parse(r.value));
           } catch {}
         }
@@ -55,7 +55,7 @@ async function storeList(ns) {
 async function storeDelete(ns, id) {
   try {
     if (window.storage) {
-      await window.storage.delete(ns, id, false);
+      await window.storage.delete(ns + ':' + id, false);
       return;
     }
   } catch {}

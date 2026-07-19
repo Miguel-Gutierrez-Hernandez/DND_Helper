@@ -8,7 +8,7 @@ function encounterMultiplier(n) {
 }
 
 function suggestedCount(players, level, difficulty, monsterXp) {
-  const perChar = XPTHRESHOLDS[Math.min(20, Math.max(1, level)) - 1][DIFFINDEX[difficulty]];
+  const perChar = XPTHRESHOLDS[Math.min(20, Math.max(1, level))][DIFFINDEX[difficulty]];
   const totalBudget = perChar * players;
   let bestCount = 1;
 
@@ -23,8 +23,8 @@ function suggestedCount(players, level, difficulty, monsterXp) {
 }
 
 function scaleMonsterToCR(base, row) {
-  const dmgAvg = Math.round((row.dmg0 + row.dmg1) / 2);
-  const hpAvg = Math.round((row.hp0 + row.hp1) / 2);
+  const dmgAvg = Math.round((row.dmg[0] + row.dmg[1]) / 2);
+  const hpAvg = Math.round((row.hp[0] + row.hp[1]) / 2);
 
   return {
     name: base.name,
@@ -49,10 +49,10 @@ function buildRandomMonster(row) {
     type: pick(RANDOMTYPES),
     cr: row.cr,
     ac: row.ac,
-    hp: Math.round((row.hp0 + row.hp1) / 2),
+    hp: Math.round((row.hp[0] + row.hp[1]) / 2),
     hpRange: row.hp,
     attackBonus: row.atk,
-    dmgPerRound: Math.round((row.dmg0 + row.dmg1) / 2),
+    dmgPerRound: Math.round((row.dmg[0] + row.dmg[1]) / 2),
     dmgRange: row.dmg,
     saveDC: row.dc,
     prof: row.prof,

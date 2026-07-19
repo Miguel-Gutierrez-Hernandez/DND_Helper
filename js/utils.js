@@ -57,7 +57,7 @@ function crRowByNumber(n) {
 }
 
 function crRowById(id) {
-  return CRTABLE.find(r => r.crid === id) || CRTABLE[4];
+  return CRTABLE.find(r => r.cr === id) || CRTABLE[4];
 }
 
 function downloadJSON(filename, obj) {

@@ -6,7 +6,7 @@ function buildShopStock(job, partyLevel) {
   let magicItems = [];
 
   tiers.forEach(tier => {
-    const pool = MAGICPOOL[tier] || MAGICPOOL[tier]?.[job.shop] || [];
+    const pool = MAGICPOOL[tier]?.[job.shop] || [];
     if (!pool || !pool.length) return;
     if (tier === 'legendary') {
       if (Math.random() < 0.3) magicItems.push({ item: pick(pool), rarity: tier });
