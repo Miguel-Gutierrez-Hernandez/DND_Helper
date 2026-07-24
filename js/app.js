@@ -207,6 +207,13 @@ function filterSpells() {
         <div class="spell-card">
           <div class="spell-name">${s.name} <span style="font-weight:400;font-size:11px;opacity:.65;">· Nv${s.level}${s.custom ? ' · personalizado' : ''}</span></div>
           <div class="spell-desc">${s.desc}</div>
+          <div class="spell-meta">
+            ${s.range ? `<span class="spell-badge">📏 ${s.range}</span>` : ''}
+            ${s.cast ? `<span class="spell-badge">⏱ ${s.cast}</span>` : ''}
+            ${s.duration ? `<span class="spell-badge">⏳ ${s.duration}</span>` : ''}
+            ${s.concentration ? `<span class="spell-badge spell-badge-conc">◎ Concentración</span>` : ''}
+            ${s.damage ? `<span class="spell-badge spell-badge-dmg">🎲 ${s.damage}</span>` : ''}
+          </div>
         </div>
       `).join('')
     : '<div class="empty-state">No se encontraron hechizos.</div>';

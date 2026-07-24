@@ -308,6 +308,30 @@
             <label>Qué hace</label>
             <textarea id="ws-desc" rows="3" placeholder="Descripción breve del efecto"></textarea>
           </div>
+          <div class="row2">
+            <div class="field">
+              <label>Alcance</label>
+              <input type="text" id="ws-range" placeholder="p. ej. 18 m, Toque, Personal">
+            </div>
+            <div class="field">
+              <label>Tiempo de lanzamiento</label>
+              <input type="text" id="ws-cast" placeholder="p. ej. 1 acción, 1 reacción">
+            </div>
+          </div>
+          <div class="row2">
+            <div class="field">
+              <label>Duración</label>
+              <input type="text" id="ws-duration" placeholder="p. ej. Instantáneo, Hasta 1 minuto">
+            </div>
+            <div class="field">
+              <label>Dados de daño (opcional)</label>
+              <input type="text" id="ws-damage" placeholder="p. ej. 3d6 fuego">
+            </div>
+          </div>
+          <label class="checkline">
+            <input type="checkbox" id="ws-concentration">
+            <span>Requiere concentración</span>
+          </label>
 
           <button class="seal-btn" id="ws-add" style="--tone:#3f9186;--tone-dim:#2a5f58;"><span class="seal-icon"></span> Añadir hechizo</button>
           <div class="saved-list" id="workshop-spell-list" style="margin-top:18px;"></div>

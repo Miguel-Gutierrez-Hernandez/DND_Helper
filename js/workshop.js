@@ -1,3 +1,6 @@
+/* ================= TALLER: contenido personalizado ================= */
+
+/* -------- helpers de fusión con el contenido base -------- */
 function getMonsterById(id) {
   const custom = (window.CUSTOMMONSTERSCACHE || []).find(m => m.id === id);
   if (custom) return custom;
@@ -98,13 +101,18 @@ async function addCustomSpell() {
   const name = document.getElementById('ws-name').value.trim();
   const level = Number(document.getElementById('ws-level').value);
   const desc = document.getElementById('ws-desc').value.trim();
+  const range = document.getElementById('ws-range').value.trim() || 'No especificado';
+  const cast = document.getElementById('ws-cast').value.trim() || '1 acción';
+  const duration = document.getElementById('ws-duration').value.trim() || 'Instantáneo';
+  const damage = document.getElementById('ws-damage').value.trim() || null;
+  const concentration = document.getElementById('ws-concentration').checked;
   if (!name) { alert('Ponle un nombre al hechizo.'); return; }
   if (!desc) { alert('Describe qué hace.'); return; }
 
   const data = {
     id: 'cspell-' + Date.now() + '-' + rnd(100000),
     savedAt: Date.now(),
-    name, level, desc, custom: true,
+    name, level, desc, range, cast, duration, damage, concentration, custom: true,
   };
   await saveCustomSpell(data);
   await refreshCustomSpellsCache();
@@ -113,6 +121,11 @@ async function addCustomSpell() {
 
   document.getElementById('ws-name').value = '';
   document.getElementById('ws-desc').value = '';
+  document.getElementById('ws-range').value = '';
+  document.getElementById('ws-cast').value = '';
+  document.getElementById('ws-duration').value = '';
+  document.getElementById('ws-damage').value = '';
+  document.getElementById('ws-concentration').checked = false;
 }
 
 /* -------- listas del taller -------- */
@@ -153,7 +166,7 @@ async function refreshWorkshopLists() {
     <div class="saved-card">
       <div class="saved-card-main">
         <div class="saved-card-name">${s.name}</div>
-        <div class="saved-card-sub">Nivel ${s.level}</div>
+        <div class="saved-card-sub">Nivel ${s.level}${s.range ? ' · ' + s.range : ''}${s.concentration ? ' · Concentración' : ''}${s.damage ? ' · ' + s.damage : ''}</div>
       </div>
       <div class="saved-card-actions">
         <button class="ghost-btn light" onclick="deleteCustomSpell('${s.id}').then(async()=>{await refreshCustomSpellsCache();refreshWorkshopLists();if(typeof filterSpells==='function')filterSpells();})">Eliminar</button>
