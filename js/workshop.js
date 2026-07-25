@@ -36,7 +36,9 @@ async function addCustomMonster() {
   const name = document.getElementById('wm-name').value.trim();
   const type = document.getElementById('wm-type').value.trim() || 'Monstruosidad personalizada';
   const cr = document.getElementById('wm-cr').value;
-  const attackName = document.getElementById('wm-attackname').value.trim() || 'Ataque';
+  const attackNames = document.getElementById('wm-attacknames').value.split('\n').map(t => t.trim()).filter(Boolean);
+  const attackName = attackNames[0] || 'Ataque';
+  const multiattack = attackNames.length > 1 ? attackNames : null;
   const traits = document.getElementById('wm-traits').value.split('\n').map(t => t.trim()).filter(Boolean);
   if (!name) { alert('Ponle un nombre al monstruo.'); return; }
 
@@ -56,7 +58,7 @@ async function addCustomMonster() {
   const data = {
     id: 'cmon-' + Date.now() + '-' + rnd(100000),
     savedAt: Date.now(),
-    name, type, cr, attackName, traits: traits.length ? traits : ['Sin rasgos especiales'],
+    name, type, cr, attackName, multiattack, traits: traits.length ? traits : ['Sin rasgos especiales'],
     manual, custom: true,
   };
   await saveCustomMonster(data);
@@ -66,7 +68,7 @@ async function addCustomMonster() {
 
   document.getElementById('wm-name').value = '';
   document.getElementById('wm-type').value = '';
-  document.getElementById('wm-attackname').value = '';
+  document.getElementById('wm-attacknames').value = '';
   document.getElementById('wm-traits').value = '';
   document.getElementById('wm-manual-toggle').checked = false;
   document.getElementById('wm-manual-fields').style.display = 'none';
@@ -142,7 +144,7 @@ async function refreshWorkshopLists() {
     <div class="saved-card">
       <div class="saved-card-main">
         <div class="saved-card-name">${m.name}</div>
-        <div class="saved-card-sub">${m.type} · CR ${m.cr}${m.manual ? ' · estadísticas propias' : ''}</div>
+        <div class="saved-card-sub">${m.type} · CR ${m.cr}${m.manual ? ' · estadísticas propias' : ''}${m.multiattack ? ' · multiataque (' + m.multiattack.length + ')' : ''}</div>
       </div>
       <div class="saved-card-actions">
         <button class="ghost-btn light" onclick="deleteCustomMonster('${m.id}').then(async()=>{await refreshCustomMonstersCache();await populateMonsterSelect();refreshWorkshopLists();})">Eliminar</button>

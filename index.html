@@ -128,12 +128,22 @@
             <div class="radio-row">
               <label><input type="radio" name="monmode" value="existing" checked /> Monstruo existente ajustado a mis jugadores</label>
               <label><input type="radio" name="monmode" value="random" /> Completamente aleatorio</label>
+              <label><input type="radio" name="monmode" value="mixed" /> Encuentro mixto (varios tipos a la vez)</label>
             </div>
           </fieldset>
 
           <div class="field" id="mon-existing-field">
             <label>Monstruo</label>
             <select id="mon-base"></select>
+          </div>
+
+          <div class="field" id="mon-mixed-field" style="display:none">
+            <label>Cantidad de cada monstruo en el encuentro</label>
+            <div class="mixed-list" id="mon-mixed-list"></div>
+            <label class="checkline" style="margin-top:10px;">
+              <input type="checkbox" id="mon-mixed-scale">
+              <span>Escalar todos los monstruos al nivel medio del grupo</span>
+            </label>
           </div>
 
           <div class="row2">
@@ -215,8 +225,8 @@
             </div>
           </div>
           <div class="field">
-            <label>Nombre del ataque</label>
-            <input type="text" id="wm-attackname" placeholder="p. ej. Garras cenicientas">
+            <label>Ataques (uno por línea; si pones más de uno, será multiataque)</label>
+            <textarea id="wm-attacknames" rows="2" placeholder="Garra&#10;Garra&#10;Mordisco"></textarea>
           </div>
           <div class="field">
             <label>Rasgos (uno por línea)</label>

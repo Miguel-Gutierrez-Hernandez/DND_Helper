@@ -94,6 +94,7 @@ async function importAllDataFromFile(file) {
 async function populateMonsterSelect() {
   const all = getAllMonstersMerged();
   fillSelect(document.getElementById('mon-base'), all, m => m.id, m => `${m.name} · CR ${m.cr}${m.custom ? ' (personalizado)' : ''}`);
+  if (document.getElementById('mon-mixed-list')) renderMixedMonsterPicker();
 }
 
 async function initUI() {
@@ -150,14 +151,17 @@ async function initUI() {
   document.querySelectorAll('input[name="scalemethod"]').forEach(r => r.addEventListener('change', refreshMonsterScaleUI));
 
   document.getElementById('mon-generate').addEventListener('click', () => {
+    const mode = document.querySelector('input[name="monmode"]:checked').value;
     generateMonster({
-      mode: document.querySelector('input[name="monmode"]:checked').value,
+      mode,
       scaleMethod: document.querySelector('input[name="scalemethod"]:checked').value,
       players: Number(document.getElementById('mon-players').value || 4),
       level: Number(document.getElementById('mon-level').value || 5),
       difficulty: document.getElementById('mon-difficulty').value,
       targetCr: document.getElementById('mon-target-cr').value,
-      baseId: document.getElementById('mon-base').value
+      baseId: document.getElementById('mon-base').value,
+      selections: mode === 'mixed' ? collectMixedSelections() : null,
+      scaleToParty: document.getElementById('mon-mixed-scale').checked
     });
   });
 
