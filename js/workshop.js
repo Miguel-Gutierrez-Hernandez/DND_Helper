@@ -32,6 +32,42 @@ function populateWorkshopCrSelect() {
   sel.innerHTML = CRTABLE.map(r => `<option value="${r.cr}">CR ${r.cr} (XP ${r.xp})</option>`).join('');
 }
 
+let editingMonsterId = null;
+
+function editCustomMonster(id) {
+  const m = (window.CUSTOMMONSTERSCACHE || []).find(x => x.id === id);
+  if (!m) return;
+  editingMonsterId = id;
+  document.getElementById('wm-name').value = m.name;
+  document.getElementById('wm-type').value = m.type;
+  document.getElementById('wm-cr').value = m.cr;
+  document.getElementById('wm-attacknames').value = (m.multiattack && m.multiattack.length ? m.multiattack : [m.attackName]).join('\n');
+  document.getElementById('wm-traits').value = (m.traits || []).join('\n');
+  const hasManual = !!m.manual;
+  document.getElementById('wm-manual-toggle').checked = hasManual;
+  document.getElementById('wm-manual-fields').style.display = hasManual ? 'grid' : 'none';
+  document.getElementById('wm-ac').value = hasManual && m.manual.ac != null ? m.manual.ac : '';
+  document.getElementById('wm-hp').value = hasManual && m.manual.hp != null ? m.manual.hp : '';
+  document.getElementById('wm-atkbonus').value = hasManual && m.manual.attackBonus != null ? m.manual.attackBonus : '';
+  document.getElementById('wm-dmg').value = hasManual && m.manual.dmgPerRound != null ? m.manual.dmgPerRound : '';
+  document.getElementById('wm-dc').value = hasManual && m.manual.saveDC != null ? m.manual.saveDC : '';
+  document.getElementById('wm-add-label').textContent = 'Guardar cambios';
+  document.getElementById('wm-cancel').style.display = 'inline-block';
+  document.getElementById('workshop-monster-form')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelEditMonster() {
+  editingMonsterId = null;
+  document.getElementById('wm-name').value = '';
+  document.getElementById('wm-type').value = '';
+  document.getElementById('wm-attacknames').value = '';
+  document.getElementById('wm-traits').value = '';
+  document.getElementById('wm-manual-toggle').checked = false;
+  document.getElementById('wm-manual-fields').style.display = 'none';
+  document.getElementById('wm-add-label').textContent = 'Añadir monstruo';
+  document.getElementById('wm-cancel').style.display = 'none';
+}
+
 async function addCustomMonster() {
   const name = document.getElementById('wm-name').value.trim();
   const type = document.getElementById('wm-type').value.trim() || 'Monstruosidad personalizada';
@@ -56,7 +92,7 @@ async function addCustomMonster() {
   }
 
   const data = {
-    id: 'cmon-' + Date.now() + '-' + rnd(100000),
+    id: editingMonsterId || ('cmon-' + Date.now() + '-' + rnd(100000)),
     savedAt: Date.now(),
     name, type, cr, attackName, multiattack, traits: traits.length ? traits : ['Sin rasgos especiales'],
     manual, custom: true,
@@ -64,17 +100,36 @@ async function addCustomMonster() {
   await saveCustomMonster(data);
   await refreshCustomMonstersCache();
   await populateMonsterSelect();
+  cancelEditMonster();
   refreshWorkshopLists();
-
-  document.getElementById('wm-name').value = '';
-  document.getElementById('wm-type').value = '';
-  document.getElementById('wm-attacknames').value = '';
-  document.getElementById('wm-traits').value = '';
-  document.getElementById('wm-manual-toggle').checked = false;
-  document.getElementById('wm-manual-fields').style.display = 'none';
 }
 
 /* -------- objeto mágico personalizado -------- */
+let editingItemId = null;
+
+function editCustomItem(id) {
+  const it = (window.CUSTOMITEMSCACHE || []).find(x => x.id === id);
+  if (!it) return;
+  editingItemId = id;
+  document.getElementById('wi-name').value = it.name;
+  document.getElementById('wi-type').value = it.type;
+  document.getElementById('wi-rarity').value = it.rarity;
+  document.getElementById('wi-bonus').value = it.bonus || '';
+  document.getElementById('wi-ability').value = it.ability;
+  document.getElementById('wi-add-label').textContent = 'Guardar cambios';
+  document.getElementById('wi-cancel').style.display = 'inline-block';
+  document.getElementById('workshop-item-form')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelEditItem() {
+  editingItemId = null;
+  document.getElementById('wi-name').value = '';
+  document.getElementById('wi-bonus').value = '';
+  document.getElementById('wi-ability').value = '';
+  document.getElementById('wi-add-label').textContent = 'Añadir objeto';
+  document.getElementById('wi-cancel').style.display = 'none';
+}
+
 async function addCustomItem() {
   const name = document.getElementById('wi-name').value.trim();
   const type = document.getElementById('wi-type').value;
@@ -85,20 +140,49 @@ async function addCustomItem() {
   if (!ability) { alert('Describe su habilidad especial.'); return; }
 
   const data = {
-    id: 'citem-' + Date.now() + '-' + rnd(100000),
+    id: editingItemId || ('citem-' + Date.now() + '-' + rnd(100000)),
     savedAt: Date.now(),
     name, type, rarity, bonus, ability, custom: true,
   };
   await saveCustomItem(data);
   await refreshCustomItemsCache();
+  cancelEditItem();
   refreshWorkshopLists();
-
-  document.getElementById('wi-name').value = '';
-  document.getElementById('wi-bonus').value = '';
-  document.getElementById('wi-ability').value = '';
 }
 
 /* -------- hechizo personalizado -------- */
+let editingSpellId = null;
+
+function editCustomSpell(id) {
+  const s = (window.CUSTOMSPELLSCACHE || []).find(x => x.id === id);
+  if (!s) return;
+  editingSpellId = id;
+  document.getElementById('ws-name').value = s.name;
+  document.getElementById('ws-level').value = s.level;
+  document.getElementById('ws-desc').value = s.desc;
+  document.getElementById('ws-range').value = s.range || '';
+  document.getElementById('ws-cast').value = s.cast || '';
+  document.getElementById('ws-duration').value = s.duration || '';
+  document.getElementById('ws-damage').value = s.damage || '';
+  document.getElementById('ws-concentration').checked = !!s.concentration;
+  document.getElementById('ws-add-label').textContent = 'Guardar cambios';
+  document.getElementById('ws-cancel').style.display = 'inline-block';
+  document.getElementById('workshop-spell-form')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' });
+}
+
+function cancelEditSpell() {
+  editingSpellId = null;
+  document.getElementById('ws-name').value = '';
+  document.getElementById('ws-desc').value = '';
+  document.getElementById('ws-range').value = '';
+  document.getElementById('ws-cast').value = '';
+  document.getElementById('ws-duration').value = '';
+  document.getElementById('ws-damage').value = '';
+  document.getElementById('ws-concentration').checked = false;
+  document.getElementById('ws-add-label').textContent = 'Añadir hechizo';
+  document.getElementById('ws-cancel').style.display = 'none';
+}
+
 async function addCustomSpell() {
   const name = document.getElementById('ws-name').value.trim();
   const level = Number(document.getElementById('ws-level').value);
@@ -112,22 +196,15 @@ async function addCustomSpell() {
   if (!desc) { alert('Describe qué hace.'); return; }
 
   const data = {
-    id: 'cspell-' + Date.now() + '-' + rnd(100000),
+    id: editingSpellId || ('cspell-' + Date.now() + '-' + rnd(100000)),
     savedAt: Date.now(),
     name, level, desc, range, cast, duration, damage, concentration, custom: true,
   };
   await saveCustomSpell(data);
   await refreshCustomSpellsCache();
+  cancelEditSpell();
   refreshWorkshopLists();
   if (typeof filterSpells === 'function') filterSpells();
-
-  document.getElementById('ws-name').value = '';
-  document.getElementById('ws-desc').value = '';
-  document.getElementById('ws-range').value = '';
-  document.getElementById('ws-cast').value = '';
-  document.getElementById('ws-duration').value = '';
-  document.getElementById('ws-damage').value = '';
-  document.getElementById('ws-concentration').checked = false;
 }
 
 /* -------- listas del taller -------- */
@@ -147,6 +224,7 @@ async function refreshWorkshopLists() {
         <div class="saved-card-sub">${m.type} · CR ${m.cr}${m.manual ? ' · estadísticas propias' : ''}${m.multiattack ? ' · multiataque (' + m.multiattack.length + ')' : ''}</div>
       </div>
       <div class="saved-card-actions">
+        <button class="ghost-btn light" onclick="editCustomMonster('${m.id}')">Editar</button>
         <button class="ghost-btn light" onclick="deleteCustomMonster('${m.id}').then(async()=>{await refreshCustomMonstersCache();await populateMonsterSelect();refreshWorkshopLists();})">Eliminar</button>
       </div>
     </div>`).join('') : '<div class="empty-state">Ningún monstruo personalizado todavía.</div>';
@@ -159,6 +237,7 @@ async function refreshWorkshopLists() {
         <div class="saved-card-sub">${it.type} · ${RARITY_ES_WORKSHOP[it.rarity] || it.rarity}${it.bonus ? ' · ' + it.bonus : ''}</div>
       </div>
       <div class="saved-card-actions">
+        <button class="ghost-btn light" onclick="editCustomItem('${it.id}')">Editar</button>
         <button class="ghost-btn light" onclick="deleteCustomItem('${it.id}').then(async()=>{await refreshCustomItemsCache();refreshWorkshopLists();})">Eliminar</button>
       </div>
     </div>`).join('') : '<div class="empty-state">Ningún objeto personalizado todavía.</div>';
@@ -171,6 +250,7 @@ async function refreshWorkshopLists() {
         <div class="saved-card-sub">Nivel ${s.level}${s.range ? ' · ' + s.range : ''}${s.concentration ? ' · Concentración' : ''}${s.damage ? ' · ' + s.damage : ''}</div>
       </div>
       <div class="saved-card-actions">
+        <button class="ghost-btn light" onclick="editCustomSpell('${s.id}')">Editar</button>
         <button class="ghost-btn light" onclick="deleteCustomSpell('${s.id}').then(async()=>{await refreshCustomSpellsCache();refreshWorkshopLists();if(typeof filterSpells==='function')filterSpells();})">Eliminar</button>
       </div>
     </div>`).join('') : '<div class="empty-state">Ningún hechizo personalizado todavía.</div>';

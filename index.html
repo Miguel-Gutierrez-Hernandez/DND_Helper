@@ -133,12 +133,16 @@
           </fieldset>
 
           <div class="field" id="mon-existing-field">
-            <label>Monstruo</label>
+            <label>Buscar monstruo</label>
+            <input type="text" id="mon-base-search" placeholder="Escribe para filtrar...">
+            <label style="margin-top:10px;">Monstruo</label>
             <select id="mon-base"></select>
           </div>
 
           <div class="field" id="mon-mixed-field" style="display:none">
-            <label>Cantidad de cada monstruo en el encuentro</label>
+            <label>Buscar en la lista</label>
+            <input type="text" id="mon-mixed-search" placeholder="Escribe para filtrar...">
+            <label style="margin-top:10px;">Cantidad de cada monstruo en el encuentro</label>
             <div class="mixed-list" id="mon-mixed-list"></div>
             <label class="checkline" style="margin-top:10px;">
               <input type="checkbox" id="mon-mixed-scale">
@@ -245,7 +249,10 @@
             <div><label>CD de salvación</label><input type="number" id="wm-dc" placeholder="p. ej. 15"></div>
           </div>
 
-          <button class="seal-btn" id="wm-add" style="--tone:#c1502f;--tone-dim:#7d3520;"><span class="seal-icon"></span> Añadir monstruo</button>
+          <div class="row2">
+            <button class="seal-btn" id="wm-add" style="--tone:#c1502f;--tone-dim:#7d3520;"><span class="seal-icon"></span> <span id="wm-add-label">Añadir monstruo</span></button>
+            <button class="ghost-btn light" id="wm-cancel" style="display:none;" onclick="cancelEditMonster()">Cancelar edición</button>
+          </div>
           <div class="saved-list" id="workshop-monster-list" style="margin-top:18px;"></div>
         </div>
 
@@ -287,7 +294,10 @@
             <textarea id="wi-ability" rows="3" placeholder="Describe qué hace de especial este objeto"></textarea>
           </div>
 
-          <button class="seal-btn" id="wi-add" style="--tone:#8c6fd4;--tone-dim:#5c4a8f;"><span class="seal-icon"></span> Añadir objeto</button>
+          <div class="row2">
+            <button class="seal-btn" id="wi-add" style="--tone:#8c6fd4;--tone-dim:#5c4a8f;"><span class="seal-icon"></span> <span id="wi-add-label">Añadir objeto</span></button>
+            <button class="ghost-btn light" id="wi-cancel" style="display:none;" onclick="cancelEditItem()">Cancelar edición</button>
+          </div>
           <div class="saved-list" id="workshop-item-list" style="margin-top:18px;"></div>
         </div>
 
@@ -343,7 +353,10 @@
             <span>Requiere concentración</span>
           </label>
 
-          <button class="seal-btn" id="ws-add" style="--tone:#3f9186;--tone-dim:#2a5f58;"><span class="seal-icon"></span> Añadir hechizo</button>
+          <div class="row2">
+            <button class="seal-btn" id="ws-add" style="--tone:#3f9186;--tone-dim:#2a5f58;"><span class="seal-icon"></span> <span id="ws-add-label">Añadir hechizo</span></button>
+            <button class="ghost-btn light" id="ws-cancel" style="display:none;" onclick="cancelEditSpell()">Cancelar edición</button>
+          </div>
           <div class="saved-list" id="workshop-spell-list" style="margin-top:18px;"></div>
         </div>
 
@@ -358,6 +371,11 @@
         <label class="file-btn">Importar un personaje<input type="file" accept="application/json" id="import-single-pc"></label>
       </div>
       <p class="hint" style="margin:-10px 0 20px;">«Exportar todo» hace una copia de seguridad completa (PNJ, personajes y contenido del Taller). Para compartir un solo personaje con alguien, usa el botón «⬇ Datos (JSON)» de su ficha, o «📄 Ficha para el jugador» si quieres un documento legible y bonito para imprimir o leer fuera de la app.</p>
+
+      <div class="field" style="max-width:340px;">
+        <label>Buscar por nombre</label>
+        <input type="text" id="saved-search" placeholder="Escribe para filtrar PNJ y personajes...">
+      </div>
 
       <div class="saved-columns">
         <div>

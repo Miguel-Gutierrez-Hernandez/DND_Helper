@@ -9,47 +9,61 @@ function activateTab(tab) {
   document.getElementById(`panel-${tab}`).classList.add('active');
 }
 
+let cachedSavedNPCs = [];
+let cachedSavedPCs = [];
+
 function refreshSavedList() {
-  Promise.all([listSavedNPCs(), listSavedPCs()]).then(([npcItems, pcItems]) => {
-    const badgeEl = document.getElementById('saved-backend-badge');
-    if (badgeEl) {
-      badgeEl.textContent = storageBackend === 'storage'
-        ? 'Guardado permanente en tu navegador'
-        : 'Guardado solo en esta sesión';
-    }
-
-    const npcEl = document.getElementById('saved-list-npc');
-    npcEl.innerHTML = npcItems.length
-      ? npcItems.map(n => `
-        <div class="saved-card">
-          <div class="saved-card-main">
-            <div class="saved-card-name">${n.name}</div>
-            <div class="saved-card-sub">${n.raceName} ${n.jobName} · Nivel ${n.level}</div>
-          </div>
-          <div class="saved-card-actions">
-            <button class="ghost-btn light" onclick="viewSavedNPC('${n.id}')">Ver</button>
-            <button class="ghost-btn light" onclick="deleteSavedNPC('${n.id}').then(refreshSavedList)">Eliminar</button>
-          </div>
-        </div>
-      `).join('')
-      : `<div class="empty-state">Ningún PNJ guardado todavía.</div>`;
-
-    const pcEl = document.getElementById('saved-list-pc');
-    pcEl.innerHTML = pcItems.length
-      ? pcItems.map(n => `
-        <div class="saved-card">
-          <div class="saved-card-main">
-            <div class="saved-card-name">${n.name}</div>
-            <div class="saved-card-sub">${n.speciesName} ${n.className}${n.subclassName ? ` · ${n.subclassName}` : ''} · Nivel ${n.level}</div>
-          </div>
-          <div class="saved-card-actions">
-            <button class="ghost-btn light" onclick="viewSavedPC('${n.id}')">Ver</button>
-            <button class="ghost-btn light" onclick="deleteSavedPC('${n.id}').then(refreshSavedList)">Eliminar</button>
-          </div>
-        </div>
-      `).join('')
-      : `<div class="empty-state">Ningún personaje guardado todavía.</div>`;
+  return Promise.all([listSavedNPCs(), listSavedPCs()]).then(([npcItems, pcItems]) => {
+    cachedSavedNPCs = npcItems;
+    cachedSavedPCs = pcItems;
+    renderSavedLists();
   });
+}
+
+function renderSavedLists() {
+  const badgeEl = document.getElementById('saved-backend-badge');
+  if (badgeEl) {
+    badgeEl.textContent = storageBackend === 'storage'
+      ? 'Guardado permanente en tu navegador'
+      : 'Guardado solo en esta sesión';
+  }
+
+  const searchEl = document.getElementById('saved-search');
+  const q = (searchEl?.value || '').toLowerCase();
+  const npcItems = cachedSavedNPCs.filter(n => n.name.toLowerCase().includes(q));
+  const pcItems = cachedSavedPCs.filter(n => n.name.toLowerCase().includes(q));
+
+  const npcEl = document.getElementById('saved-list-npc');
+  npcEl.innerHTML = npcItems.length
+    ? npcItems.map(n => `
+      <div class="saved-card">
+        <div class="saved-card-main">
+          <div class="saved-card-name">${n.name}</div>
+          <div class="saved-card-sub">${n.raceName} ${n.jobName} · Nivel ${n.level}</div>
+        </div>
+        <div class="saved-card-actions">
+          <button class="ghost-btn light" onclick="viewSavedNPC('${n.id}')">Ver</button>
+          <button class="ghost-btn light" onclick="deleteSavedNPC('${n.id}').then(refreshSavedList)">Eliminar</button>
+        </div>
+      </div>
+    `).join('')
+    : `<div class="empty-state">${q ? 'Ningún PNJ coincide con la búsqueda.' : 'Ningún PNJ guardado todavía.'}</div>`;
+
+  const pcEl = document.getElementById('saved-list-pc');
+  pcEl.innerHTML = pcItems.length
+    ? pcItems.map(n => `
+      <div class="saved-card">
+        <div class="saved-card-main">
+          <div class="saved-card-name">${n.name}</div>
+          <div class="saved-card-sub">${n.speciesName} ${n.className}${n.subclassName ? ` · ${n.subclassName}` : ''} · Nivel ${n.level}</div>
+        </div>
+        <div class="saved-card-actions">
+          <button class="ghost-btn light" onclick="viewSavedPC('${n.id}')">Ver</button>
+          <button class="ghost-btn light" onclick="deleteSavedPC('${n.id}').then(refreshSavedList)">Eliminar</button>
+        </div>
+      </div>
+    `).join('')
+    : `<div class="empty-state">${q ? 'Ningún personaje coincide con la búsqueda.' : 'Ningún personaje guardado todavía.'}</div>`;
 }
 
 async function exportAllData() {
@@ -92,9 +106,24 @@ async function importAllDataFromFile(file) {
 }
 
 async function populateMonsterSelect() {
-  const all = getAllMonstersMerged();
-  fillSelect(document.getElementById('mon-base'), all, m => m.id, m => `${m.name} · CR ${m.cr}${m.custom ? ' (personalizado)' : ''}`);
+  fillMonsterSelectFiltered();
   if (document.getElementById('mon-mixed-list')) renderMixedMonsterPicker();
+}
+
+function fillMonsterSelectFiltered() {
+  const searchEl = document.getElementById('mon-base-search');
+  const q = (searchEl?.value || '').toLowerCase();
+  const all = getAllMonstersMerged().filter(m => m.name.toLowerCase().includes(q));
+  fillSelect(document.getElementById('mon-base'), all, m => m.id, m => `${m.name} · CR ${m.cr}${m.custom ? ' (personalizado)' : ''}`);
+}
+
+function filterMixedMonsterList() {
+  const searchEl = document.getElementById('mon-mixed-search');
+  const q = (searchEl?.value || '').toLowerCase();
+  document.querySelectorAll('#mon-mixed-list .mixed-row').forEach(row => {
+    const name = (row.querySelector('.mixed-row-name')?.textContent || '').toLowerCase();
+    row.style.display = name.includes(q) ? 'flex' : 'none';
+  });
 }
 
 async function initUI() {
@@ -150,6 +179,9 @@ async function initUI() {
   document.querySelectorAll('input[name="monmode"]').forEach(r => r.addEventListener('change', refreshMonsterModeUI));
   document.querySelectorAll('input[name="scalemethod"]').forEach(r => r.addEventListener('change', refreshMonsterScaleUI));
 
+  document.getElementById('mon-base-search').addEventListener('input', fillMonsterSelectFiltered);
+  document.getElementById('mon-mixed-search').addEventListener('input', filterMixedMonsterList);
+
   document.getElementById('mon-generate').addEventListener('click', () => {
     const mode = document.querySelector('input[name="monmode"]:checked').value;
     generateMonster({
@@ -178,6 +210,8 @@ async function initUI() {
     e.target.value = '';
   });
 
+  document.getElementById('saved-search').addEventListener('input', renderSavedLists);
+
   filterSpells();
   refreshSubclassOptions();
   refreshMonsterModeUI();
@@ -205,16 +239,16 @@ function refreshSubclassOptions() {
 function filterSpells() {
   const input = document.getElementById('spell-search').value.toLowerCase();
   const listEl = document.getElementById('spell-list');
-  
+
   // Aplanamos todos los hechizos de todos los niveles (base + personalizados) en un solo array
   const allSpells = getAllSpellsFlatMerged();
-  
-  const filtered = allSpells.filter(s => 
-    s.name.toLowerCase().includes(input) || 
+
+  const filtered = allSpells.filter(s =>
+    s.name.toLowerCase().includes(input) ||
     s.desc.toLowerCase().includes(input)
   );
 
-  listEl.innerHTML = filtered.length > 0 
+  listEl.innerHTML = filtered.length > 0
     ? filtered.map(s => `
         <div class="spell-card">
           <div class="spell-name">${s.name} <span style="font-weight:400;font-size:11px;opacity:.65;">· Nv${s.level}${s.custom ? ' · personalizado' : ''}</span></div>

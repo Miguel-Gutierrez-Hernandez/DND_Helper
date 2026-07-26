@@ -19,8 +19,8 @@ function spellcasterInfo(klass, level) {
     info.pactSlots = p[0];
     info.pactLevel = p[1];
     info.maxSpellLevel = p[1];
-    info.cantrips = level < 4 ? 2 : level < 10 ? 3 : 4;
   }
+  info.cantrips = level < 4 ? 2 : level < 10 ? 3 : 4;
 
   return info;
 }
@@ -28,18 +28,44 @@ function spellcasterInfo(klass, level) {
 function pickSpellsForCaster(info, level) {
   if (!info) return null;
   const cantrips = pickN(getSpellPoolForLevel(0), info.cantrips || 3).map(s => s.name);
-  const known = [];
   const maxLvl = info.maxSpellLevel || 1;
-  const numKnownIsh = info.type === 'known' ? Math.min(2 + level, 15) : Math.min(2 + level, 15);
+  const numKnownIsh = Math.min(2 + level, 15);
   const spellsSet = new Set();
 
   while (spellsSet.size < numKnownIsh) {
     const lvl = 1 + rnd(maxLvl);
     const pool = getSpellPoolForLevel(lvl);
-    if (!pool.length) break; 
+    if (!pool.length) break;
     spellsSet.add(pick(pool).name);
   }
   return { cantrips, spells: [...spellsSet] };
+}
+
+/* CA final antes de aplicar el bono de objetos, según armadura de la clase y estadísticas */
+function computeAC(klass, stats) {
+  const dexMod = abilityMod(stats.dex);
+  let ac = 10 + dexMod;
+  if (klass.armor.includes('pesada')) ac = 16 + (klass.armor.includes('escudo') ? 2 : 0);
+  else if (klass.armor.includes('media')) ac = 13 + Math.min(dexMod, 2) + (klass.armor.includes('escudo') ? 2 : 0);
+  else if (klass.armor.includes('ligera')) ac = 11 + dexMod;
+  else if (klass.armor.includes('Defensa sin Armadura')) {
+    const secondMod = klass.id === 'barbaro' ? abilityMod(stats.con) : abilityMod(stats.wis);
+    ac = 10 + dexMod + secondMod;
+  }
+  return ac;
+}
+
+/* aplica las mejoras de nivel (dote / mejora de característica) para todos los umbrales
+   entre el nivel anterior (exclusive) y el nuevo nivel (inclusive); muta `stats` */
+function applyImprovements(stats, fromLevelExclusive, toLevelInclusive) {
+  const gained = [];
+  ASI_LEVELS.forEach(lvl => {
+    if (lvl > fromLevelExclusive && lvl <= toLevelInclusive) {
+      const res = rollAsiOrFeat(stats);
+      gained.push({ level: lvl, desc: res.desc });
+    }
+  });
+  return gained;
 }
 
 function buildPCData(opts) {
@@ -63,20 +89,14 @@ function buildPCData(opts) {
     bgAbilities.forEach(a => (stats[a] = Math.min(20, stats[a] + 1)));
   }
 
+  // dotes / mejoras de característica en los niveles 4, 8, 12, 16 y 19 alcanzados
+  const improvements = applyImprovements(stats, 0, level);
+
   const conMod = abilityMod(stats.con);
   const avgDie = Math.floor(klass.hitDie / 2) + 1;
   const hp = klass.hitDie + conMod + (level - 1) * (avgDie + conMod);
   const pb = profBonus(level);
-  const dexMod = abilityMod(stats.dex);
-
-  let ac = 10 + dexMod;
-  if (klass.armor.includes('pesada')) ac = 16 + (klass.armor.includes('escudo') ? 2 : 0);
-  else if (klass.armor.includes('media')) ac = 13 + Math.min(dexMod, 2) + (klass.armor.includes('escudo') ? 2 : 0);
-  else if (klass.armor.includes('ligera')) ac = 11 + dexMod;
-  else if (klass.armor.includes('Defensa sin Armadura')) {
-    const secondMod = klass.id === 'barbaro' ? abilityMod(stats.con) : abilityMod(stats.wis);
-    ac = 10 + dexMod + secondMod;
-  }
+  const ac = computeAC(klass, stats);
 
   const casterInfo = spellcasterInfo(klass, level);
   const spells = casterInfo ? pickSpellsForCaster(casterInfo, level) : null;
@@ -118,7 +138,50 @@ function buildPCData(opts) {
     subclassList: klass.subclasses,
     casterInfo,
     spells,
-    items: []
+    items: [],
+    improvements,
+    notes: ''
+  };
+}
+
+/* -------- subir de nivel un PJ ya existente, conservando nombre/especie/clase/objetos/notas -------- */
+function levelUpPC(oldPc, newLevel) {
+  newLevel = Math.max(oldPc.level + 1, Math.min(20, newLevel));
+  const klass = CLASSES.find(c => c.id === oldPc.classId) || CLASSES[0];
+  const stats = { ...oldPc.stats };
+
+  const gained = applyImprovements(stats, oldPc.level, newLevel);
+  const improvements = [...(oldPc.improvements || []), ...gained];
+
+  const conMod = abilityMod(stats.con);
+  const avgDie = Math.floor(klass.hitDie / 2) + 1;
+  const hp = klass.hitDie + conMod + (newLevel - 1) * (avgDie + conMod);
+  const pb = profBonus(newLevel);
+  const ac = computeAC(klass, stats);
+
+  const casterInfo = spellcasterInfo(klass, newLevel);
+  let spells = oldPc.spells;
+  if (casterInfo) {
+    const fresh = pickSpellsForCaster(casterInfo, newLevel);
+    const cantrips = [...new Set([...(oldPc.spells?.cantrips || []), ...fresh.cantrips])].slice(0, Math.max(casterInfo.cantrips, (oldPc.spells?.cantrips || []).length));
+    const spellList = [...new Set([...(oldPc.spells?.spells || []), ...fresh.spells])];
+    spells = { cantrips, spells: spellList };
+  }
+
+  let subclassName = oldPc.subclassName;
+  if (newLevel >= 3 && !subclassName) subclassName = pick(klass.subclasses);
+
+  return {
+    ...oldPc,
+    level: newLevel,
+    stats,
+    hp,
+    ac,
+    pb,
+    casterInfo,
+    spells,
+    subclassName,
+    improvements,
   };
 }
 
@@ -170,7 +233,16 @@ function pcDataToHtml(data, options = {}) {
 
       <div class="section-title">Competencias destacadas</div>
       <div class="chiplist">${data.skills.map(s => `<span class="chip">${s}</span>`).join('')}</div>
+  `;
 
+  if (data.improvements && data.improvements.length) {
+    html += `
+      <div class="section-title">Mejoras de nivel</div>
+      <ul class="clean">${data.improvements.map(i => `<li>Nivel ${i.level}: ${i.desc}</li>`).join('')}</ul>
+    `;
+  }
+
+  html += `
       <div class="section-title">Equipo inicial</div>
       <ul class="clean">${data.gear.map(g => `<li>${g}</li>`).join('')}</ul>
   `;
@@ -190,6 +262,22 @@ function pcDataToHtml(data, options = {}) {
       ${renderAttachedItems(data.items, 'removeItemFromPC')}
       ${itemBonusSummaryLine(data.items)}
       ${renderItemPicker('pc-item-picker-select', 'addItemToPC')}
+
+      <div class="section-title">Notas</div>
+      <textarea id="pc-notes-field" rows="2" placeholder="Apuntes de campaña (opcional)">${data.notes || ''}</textarea>
+      <div class="sheet-actions" style="margin-top:8px;">
+        <button class="ghost-btn light" onclick="saveCurrentPCNote()">Guardar nota</button>
+      </div>
+
+      <div class="section-title">Subida de nivel</div>
+      <div class="row2" style="align-items:end;">
+        <div class="field" style="margin-bottom:0;">
+          <label>Nuevo nivel</label>
+          <input type="number" id="pc-levelup-target" min="${Math.min(20, data.level + 1)}" max="20" value="${Math.min(20, data.level + 1)}" ${data.level >= 20 ? 'disabled' : ''}>
+        </div>
+        <button class="ghost-btn" ${data.level >= 20 ? 'disabled' : ''} onclick="applyLevelUp()">⬆ Subir de nivel</button>
+      </div>
+      <div class="note-box">Conserva especie, clase, trasfondo, objetos y notas; recalcula PG, CA, espacios de conjuro y añade mejoras de nivel si corresponde. Pulsa «Guardar PJ» después para conservar el cambio.</div>
 
       ${savedTag}
       <div class="sheet-actions">
@@ -217,6 +305,26 @@ async function saveCurrentPC() {
   await savePCData(lastPCData);
   document.getElementById('pc-result').innerHTML = pcDataToHtml(lastPCData, { hideSave: true });
   refreshSavedList();
+}
+
+async function saveCurrentPCNote() {
+  if (!lastPCData) return;
+  const field = document.getElementById('pc-notes-field');
+  lastPCData.notes = field ? field.value : lastPCData.notes;
+  if (lastPCData.savedAt) {
+    lastPCData.savedAt = Date.now();
+    await savePCData(lastPCData);
+    refreshSavedList();
+  }
+}
+
+function applyLevelUp() {
+  if (!lastPCData) return;
+  const input = document.getElementById('pc-levelup-target');
+  const target = Number(input.value) || (lastPCData.level + 1);
+  const wasSaved = !!lastPCData.savedAt;
+  lastPCData = levelUpPC(lastPCData, target);
+  document.getElementById('pc-result').innerHTML = pcDataToHtml(lastPCData, { showDelete: wasSaved });
 }
 
 function viewSavedPC(id) {

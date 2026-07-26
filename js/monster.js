@@ -75,7 +75,9 @@ function scaleMonsterToCR(base, row) {
     prof: row.prof,
     traits: base.traits || [],
     attackName: base.attackName || 'Ataque',
-    attacks: buildAttacks(names, dmgAvg, row.atk)
+    attacks: buildAttacks(names, dmgAvg, row.atk),
+    legendary: legendaryActionsForCR(row.crn),
+    lairAction: lairActionForCR(row.crn),
   };
 }
 
@@ -107,7 +109,9 @@ function buildRandomMonster(row) {
       'Sentido sísmico 9 m'
     ], 2),
     attackName: names[0],
-    attacks: buildAttacks(names, dmgAvg, row.atk)
+    attacks: buildAttacks(names, dmgAvg, row.atk),
+    legendary: legendaryActionsForCR(row.crn),
+    lairAction: lairActionForCR(row.crn),
   };
 }
 
@@ -160,6 +164,22 @@ function attackBlockHtml(mon) {
   `;
 }
 
+function legendarySectionHtml(mon) {
+  let html = '';
+  if (mon.legendary) {
+    html += `
+      <div class="section-title">Acciones Legendarias</div>
+      <div class="attack-block">Puede realizar ${mon.legendary.count} acciones legendarias al final del turno de otra criatura, eligiendo entre las opciones de abajo (una a la vez, salvo que se indique lo contrario). Recupera las opciones gastadas al inicio de su turno.</div>
+      <ul class="clean">${mon.legendary.options.map(o => `<li>${o}</li>`).join('')}</ul>`;
+  }
+  if (mon.lairAction) {
+    html += `
+      <div class="section-title">Acción de Guarida</div>
+      <div class="attack-block">${mon.lairAction}</div>`;
+  }
+  return html;
+}
+
 function monsterSheetHtml(mon, extra = '') {
   return `
     <div class="sheet">
@@ -182,6 +202,8 @@ function monsterSheetHtml(mon, extra = '') {
       <ul class="clean">${mon.traits.map(t => `<li>${t}</li>`).join('')}</ul>
 
       ${attackBlockHtml(mon)}
+
+      ${legendarySectionHtml(mon)}
 
       ${extra}
     </div>

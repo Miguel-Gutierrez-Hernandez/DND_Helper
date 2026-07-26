@@ -136,7 +136,8 @@ function buildNPCData(raceId, jobId, partyLevel) {
     shopType: job.shop,
     partyLevel,
     shopStock,
-    items: []
+    items: [],
+    notes: ''
   };
 }
 
@@ -144,6 +145,7 @@ function npcDataToHtml(data, options = {}) {
   const saveBtn = options.hideSave ? '' : `<button class="ghost-btn" onclick="saveCurrentNPC()">Guardar PNJ</button>`;
   const regenBtn = options.hideRegen ? '' : `<button class="ghost-btn" onclick="document.getElementById('npc-generate').click()">Regenerar</button>`;
   const deleteBtn = options.showDelete ? `<button class="ghost-btn" onclick="deleteSavedNPC('${data.id}').then(refreshSavedList)">Eliminar</button>` : '';
+  const sheetBtn = `<button class="ghost-btn" onclick="downloadCurrentNPCSheetHTML()">📄 Ficha (HTML)</button>`;
 
   let html = `
     <div class="sheet">
@@ -191,9 +193,16 @@ function npcDataToHtml(data, options = {}) {
       ${renderAttachedItems(data.items, 'removeItemFromNPC')}
       ${renderItemPicker('npc-item-picker-select', 'addItemToNPC')}
 
+      <div class="section-title">Notas del DJ</div>
+      <textarea id="npc-notes-field" rows="2" placeholder="Apuntes para recordar entre sesiones (opcional)">${data.notes || ''}</textarea>
+      <div class="sheet-actions" style="margin-top:8px;">
+        <button class="ghost-btn light" onclick="saveCurrentNPCNote()">Guardar nota</button>
+      </div>
+
       <div class="sheet-actions">
         ${regenBtn}
         ${saveBtn}
+        ${sheetBtn}
         ${deleteBtn}
       </div>
     </div>
@@ -213,6 +222,17 @@ async function saveCurrentNPC() {
   await saveNPCData(lastNPCData);
   document.getElementById('npc-result').innerHTML = npcDataToHtml(lastNPCData, { hideSave: true });
   refreshSavedList();
+}
+
+async function saveCurrentNPCNote() {
+  if (!lastNPCData) return;
+  const field = document.getElementById('npc-notes-field');
+  lastNPCData.notes = field ? field.value : lastNPCData.notes;
+  if (lastNPCData.savedAt) {
+    lastNPCData.savedAt = Date.now();
+    await saveNPCData(lastNPCData);
+    refreshSavedList();
+  }
 }
 
 function viewSavedNPC(id) {

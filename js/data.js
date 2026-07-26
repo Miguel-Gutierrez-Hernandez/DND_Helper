@@ -521,3 +521,71 @@ const NAMESYLEND = ['dor', 'en', 'ion', 'ar', 'or', 'an', 'el', 'is', 'us', 'ath
 const RANDOMADJ = ['Oscuro', 'Roto', 'Verdadero', 'Ágil', 'Férreo', 'Siniestro', 'Antiguo', 'Hambriento', 'Silente', 'Voraz'];
 const RANDOMNOUN = ['Filo', 'Umbral', 'Eco', 'Cuervo', 'Brasero', 'Vigía', 'Sello', 'Abismo', 'Llama', 'Lobo'];
 const RANDOMTYPES = ['Bestia', 'No muerto', 'Constructo', 'Monstruosidad', 'Aberración', 'Humanoide', 'Fienda', 'Gigante'];
+
+/* ---------- datos compartidos por varios módulos (definidos una sola vez para toda la app) ---------- */
+const ABILITY_LABEL = { str: 'Fuerza', dex: 'Destreza', con: 'Constitución', int: 'Inteligencia', wis: 'Sabiduría', cha: 'Carisma' };
+const SKILL_ABILITY_MAP = {
+  'Acrobacias': 'dex', 'Trato con Animales': 'wis', 'Arcanos': 'int', 'Atletismo': 'str',
+  'Engaño': 'cha', 'Historia': 'int', 'Perspicacia': 'wis', 'Intimidación': 'cha',
+  'Investigación': 'int', 'Medicina': 'wis', 'Naturaleza': 'int', 'Percepción': 'wis',
+  'Interpretación': 'cha', 'Persuasión': 'cha', 'Religión': 'int', 'Juego de Manos': 'dex',
+  'Sigilo': 'dex', 'Supervivencia': 'wis',
+};
+
+/* ---------- mejoras de nivel (dote/mejora de característica) ---------- */
+const ASI_LEVELS = [4, 8, 12, 16, 19];
+const GENERAL_FEATS = [
+  'Alerta', 'Afortunado', 'Atlético', 'Combatiente con Arma a Distancia', 'Combatiente Empuñando Armas',
+  'Conjuro Iniciado', 'Curandero', 'Duro de Pelar', 'Experto en Esquivar', 'Fornido',
+  'Iniciativa de Combate', 'Observador', 'Resistente', 'Robusto', 'Vigilante',
+];
+
+/* elige entre subir una característica o tomar una dote general al alcanzar un nivel de mejora */
+function rollAsiOrFeat(stats) {
+  const abilities = ['str', 'dex', 'con', 'int', 'wis', 'cha'];
+  const takeFeat = Math.random() < 0.5;
+  if (!takeFeat) {
+    const candidates = abilities.filter(a => stats[a] < 20);
+    if (candidates.length) {
+      if (Math.random() < 0.5 && candidates.length >= 1) {
+        const a = pick(candidates);
+        stats[a] = Math.min(20, stats[a] + 2);
+        return { type: 'asi', desc: `+2 a ${ABILITY_LABEL[a]}` };
+      } else {
+        const chosen = pickN(candidates, Math.min(2, candidates.length));
+        chosen.forEach(a => stats[a] = Math.min(20, stats[a] + 1));
+        return { type: 'asi', desc: `+1 a ${chosen.map(a => ABILITY_LABEL[a]).join(' y ')}` };
+      }
+    }
+  }
+  return { type: 'feat', desc: `Dote: ${pick(GENERAL_FEATS)}` };
+}
+
+/* ---------- acciones legendarias / de guarida para monstruos de CR alto ---------- */
+const LEGENDARY_ACTION_POOL = [
+  'Ataque. La criatura realiza un ataque con una de sus armas.',
+  'Movimiento. La criatura se mueve hasta su velocidad sin provocar ataques de oportunidad.',
+  'Detectar. La criatura hace una prueba de Sabiduría (Percepción).',
+  'Presencia Aterradora (cuesta 2 acciones). Cada criatura hostil a 9 m debe superar una salvación de Sabiduría o quedar asustada hasta el final de su siguiente turno.',
+  'Golpe Rápido (cuesta 2 acciones). La criatura realiza dos ataques con una de sus armas.',
+  'Reposicionar (cuesta 2 acciones). La criatura se mueve hasta su velocidad y su siguiente ataque este turno tiene ventaja.',
+];
+const LAIR_ACTION_POOL = [
+  'La guarida tiembla: cada criatura en el área debe superar una salvación de Destreza o caer derribada.',
+  'Sombras o zarcillos brotan del entorno, imponiendo desventaja a la siguiente tirada de ataque contra la criatura.',
+  'Un eco de poder recorre la guarida y cura a la criatura una pequeña cantidad de puntos de golpe.',
+  'El terreno se vuelve traicionero: la próxima criatura que se mueva por la zona debe superar una salvación o quedar derribada.',
+];
+
+/* CR (numérico) a partir del cual una criatura recibe acciones legendarias / de guarida */
+const LEGENDARY_CR_THRESHOLD = 5;
+const LAIR_CR_THRESHOLD = 17;
+
+function legendaryActionsForCR(crn) {
+  if (crn < LEGENDARY_CR_THRESHOLD) return null;
+  const count = crn < 11 ? 2 : 3;
+  return { count, options: pickN(LEGENDARY_ACTION_POOL, Math.min(4, LEGENDARY_ACTION_POOL.length)) };
+}
+function lairActionForCR(crn) {
+  return crn >= LAIR_CR_THRESHOLD ? pick(LAIR_ACTION_POOL) : null;
+}
