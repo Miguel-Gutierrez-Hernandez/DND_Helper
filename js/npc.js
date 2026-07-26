@@ -2,6 +2,7 @@ let lastNPCData = null;
 
 function buildShopStock(job, partyLevel) {
   const mundane = SHOPMUNDANE[job.shop] || [];
+  const services = SHOPSERVICES[job.shop] || [];
   const tiers = rarityTierByLevel(partyLevel);
   let magicItems = [];
 
@@ -15,11 +16,19 @@ function buildShopStock(job, partyLevel) {
     }
   });
 
-  return { mundane, magicItems };
+  return { mundane, services, magicItems };
+}
+
+function mundaneTableHtml(rows) {
+  return `
+    <table class="shop-table">
+      <thead><tr><th>Artículo</th><th>Precio</th></tr></thead>
+      <tbody>${rows.map(n => `<tr><td>${n[0]}</td><td>${n[1]}</td></tr>`).join('')}</tbody>
+    </table>`;
 }
 
 function renderShop(job, partyLevel, stock) {
-  const { mundane, magicItems } = stock || buildShopStock(job, partyLevel);
+  const { mundane, services, magicItems } = stock || buildShopStock(job, partyLevel);
   const RARITYES = {
     common: 'Común',
     uncommon: 'Poco común',
@@ -28,15 +37,25 @@ function renderShop(job, partyLevel, stock) {
     legendary: 'Legendario'
   };
 
-  let html = `
-    <div class="section-title">Género en venta ajustado a nivel ${partyLevel}</div>
-    <table class="shop-table">
-      <thead><tr><th>Artículo</th><th>Precio</th></tr></thead>
-      <tbody>
-        ${mundane.map(n => `<tr><td>${n[0]}</td><td>${n[1]}</td></tr>`).join('')}
-      </tbody>
-    </table>
-  `;
+  let html = `<div class="section-title">Género en venta ajustado a nivel ${partyLevel}</div>`;
+
+  if (Array.isArray(mundane)) {
+    html += mundaneTableHtml(mundane);
+  } else {
+    // catálogo agrupado por categorías (p. ej. la armería)
+    html += Object.entries(mundane).map(([category, rows]) => `
+      <h3 style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);margin:12px 0 4px;">${category}</h3>
+      ${mundaneTableHtml(rows)}
+    `).join('');
+  }
+
+  const svc = services || SHOPSERVICES[job.shop] || [];
+  if (svc.length) {
+    html += `
+      <div class="section-title">Servicios</div>
+      ${mundaneTableHtml(svc)}
+    `;
+  }
 
   if (magicItems.length) {
     html += `

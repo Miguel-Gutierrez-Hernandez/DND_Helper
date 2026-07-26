@@ -309,8 +309,8 @@ const OFICIOS = [
   {id:'alquimista', name:'Alquimista / Boticario', priority:['int','wis','dex'], hitDie:6, shop:'pociones', armorHint:'ropa (10+DES)', weaponHint:'daga'},
   {id:'sacerdote', name:'Sacerdote / Clériga', priority:['wis','cha','con'], hitDie:8, shop:'templo', armorHint:'cota de escamas (14+DESmax2)', weaponHint:'maza'},
   {id:'mercader', name:'Mercader General', priority:['cha','int','wis'], hitDie:8, shop:'general', armorHint:'ropa (10+DES)', weaponHint:'bastón'},
-  {id:'tabernero', name:'Posadero / Tabernero', priority:['cha','con','wis'], hitDie:8, shop:null, armorHint:'ropa (10+DES)', weaponHint:'garrote'},
-  {id:'guardia', name:'Guardia', priority:['str','con','dex'], hitDie:10, shop:null, armorHint:'cota de malla (16)', weaponHint:'lanza'},
+  {id:'tabernero', name:'Posadero / Tabernero', priority:['cha','con','wis'], hitDie:8, shop:'taberna', armorHint:'ropa (10+DES)', weaponHint:'garrote'},
+  {id:'guardia', name:'Guardia', priority:['str','con','dex'], hitDie:10, shop:'guardia', armorHint:'cota de malla (16)', weaponHint:'lanza'},
   {id:'erudito', name:'Erudito / Bibliotecario', priority:['int','wis','cha'], hitDie:6, shop:'pergaminos', armorHint:'ropa (10+DES)', weaponHint:'daga'},
   {id:'encantador', name:'Encantador (tienda mágica)', priority:['int','cha','wis'], hitDie:6, shop:'magico', armorHint:'ropa (10+DES)', weaponHint:'vara'},
   {id:'herborista', name:'Herborista / Curandero', priority:['wis','int','con'], hitDie:8, shop:'herbolario', armorHint:'ropa (10+DES)', weaponHint:'cayado'},
@@ -325,7 +325,17 @@ const OFICIOS = [
 
 /* ---------- SHOP INVENTORY POOLS by tier (party level) ---------- */
 const SHOPMUNDANE = {
-  armeria:[['Espada larga','15 po'],['Hacha de mano','5 po'],['Cota de malla','75 po'],['Escudo','10 po'],['Yelmo de acero','—'],['20 flechas','1 po'],['Herraduras','2 po']],
+  armeria:{
+    'Armas simples cuerpo a cuerpo':[['Garrote','1 pl'],['Daga','2 po'],['Garrote grande','2 pl'],['Hacha de mano','5 po'],['Jabalina','5 pl'],['Martillo ligero','2 po'],['Maza','5 po'],['Bastón','2 pl'],['Hoz','1 po'],['Lanza','1 po']],
+    'Armas simples a distancia':[['Ballesta ligera (+20 virotes)','25 po'],['Dardo (x10)','5 pc'],['Arco corto (+20 flechas)','25 po'],['Honda','1 pl']],
+    'Armas marciales cuerpo a cuerpo':[['Hacha de batalla','10 po'],['Mangual','10 po'],['Glaive','20 po'],['Hacha grande','30 po'],['Espada a dos manos','50 po'],['Alabarda','20 po'],['Lanza de justa','10 po'],['Espada larga','15 po'],['Almádena','10 po'],['Lucero del alba','15 po'],['Pica','5 po'],['Estoque','25 po'],['Cimitarra','25 po'],['Espada corta','10 po'],['Tridente','5 po'],['Pico de guerra','5 po'],['Martillo de guerra','15 po'],['Látigo','2 po']],
+    'Armas marciales a distancia':[['Cerbatana (+10 dardos)','10 po'],['Ballesta de mano (+20 virotes)','75 po'],['Ballesta pesada (+20 virotes)','50 po'],['Arco largo (+20 flechas)','50 po']],
+    'Munición y proyectiles':[['20 flechas','1 po'],['20 virotes de ballesta','1 po'],['10 dardos','5 pc'],['20 balas de honda','4 pc']],
+    'Armadura ligera':[['Acolchada','5 po'],['Cuero','10 po'],['Cuero tachonado','45 po']],
+    'Armadura media':[['Piel','10 po'],['Cota de escamas','50 po'],['Cota de malla (camisa)','50 po'],['Coraza','400 po'],['Semiplaca','750 po']],
+    'Armadura pesada':[['Cota de anillas','30 po'],['Cota de malla','75 po'],['Bandas','200 po'],['Placas','1500 po']],
+    'Escudos y accesorios':[['Escudo','10 po'],['Yelmo de acero (cosmético)','5 po'],['Herraduras','2 po']],
+  },
   pociones:[['Poción de curación (2d4+2)','50 po'],['Antitóxico','50 po'],['Aceite','1 po'],['Vial vacío','1 po'],['Componentes de alquimia (kit)','50 po']],
   templo:[['Símbolo sagrado','5 po'],['Incienso bendito','1 po'],['Poción de curación','50 po'],['Aceite santo','25 po'],['Kit de sanador','5 po']],
   general:[['Ración de viaje (x5)','2.5 po'],['Cuerda de cáñamo 15m','1 po'],['Mochila','2 po'],['Antorcha (x5)','0.5 po'],['Saco de dormir','1 po'],['Yesca y pedernal','0.5 po']],
@@ -336,6 +346,25 @@ const SHOPMUNDANE = {
   pieles:[['Piel curtida','3-8 po'],['Cuerda para trampas','1 po'],['Cebo','1 po']],
   mercadonegro:[['Ganzúas','25 po (calidad dudosa)'],['«Mercancía sin preguntas»','negociable'],['Disfraz','7 po']],
   ropa:[['Traje sencillo','5 po'],['Traje fino','15 po'],['Capa de viaje','2 po']],
+  taberna:[['Jarra de cerveza aguada','4 pc'],['Vino decente (copa)','2 pl'],['Comida sencilla','3 pc'],['Comida abundante','5 pl'],['Habitación humilde (noche)','2 pl'],['Habitación cómoda (noche)','1 po'],['Habitación lujosa (noche)','4 po'],['Establo para montura (noche)','5 pc']],
+  guardia:[['Multa por alboroto en la vía pública','5 po'],['Multa por armas desenvainadas en la ciudad','10 po'],['«Tasa de tránsito» no oficial','2-5 po (soborno)'],['Fianza para pasar la noche fuera del calabozo','15 po']],
+};
+
+/* servicios que ofrece cada tipo de establecimiento (no objetos, sino trabajos/trámites) */
+const SHOPSERVICES = {
+  armeria:[['Reparar un arma','1-5 po, según daño'],['Reparar una armadura','5-25 po, según tamaño y daño'],['Afilado y mantenimiento','1 po'],['Forjar pieza a medida (por encargo)','según material, consulta con el herrero']],
+  templo:[['Curar una enfermedad','50 po'],['Eliminar una maldición','150 po'],['Revivir (hasta 1 minuto de muerto)','100 po + diamante de 300 po'],['Resurrección completa','500 po + componente'],['Bendición ritual antes de un viaje','10 po']],
+  magico:[['Identificar un objeto mágico','20 po + 1 hora'],['Encantar un arma o armadura existente (+1)','según objeto, consulta con el encantador'],['Recargar un objeto con cargas','variable, según el objeto']],
+  pociones:[['Preparar una poción por encargo','según receta y componentes'],['Analizar una sustancia desconocida','10 po']],
+  herbolario:[['Tratar una intoxicación o veneno','15 po'],['Preparar un remedio por encargo','variable']],
+  pergaminos:[['Copiar un hechizo a tu libro de conjuros','50 po + 2 horas por nivel del hechizo'],['Traducir un texto antiguo','10-30 po']],
+  joyeria:[['Tasar un objeto de valor','gratis si compras algo, 5 po si no'],['Engastar una gema en una pieza','variable, según la gema']],
+  general:[['Guardar equipaje (por semana)','1 po']],
+  ropa:[['Confeccionar ropa a medida','según tela, 1-2 semanas'],['Remendar ropa','1 po']],
+  pieles:[['Curtir una piel traída por el cliente','2 po por pieza']],
+  mercadonegro:[['«Preguntas discretas» (información)','negociable, con riesgo'],['Falsificar un documento','25 po o más']],
+  taberna:[['Actuación o música en directo','incluida con la bebida'],['Guardar mensajes o recados','1 pl'],['Rumores de la zona (gratis con una consumición)','—']],
+  guardia:[['Permiso para portar armas en la ciudad','10 po'],['«Mirar para otro lado» (soborno)','variable, con riesgo'],['Escolta hasta las puertas de la ciudad','5 po']],
 };
 
 /* magic item pools by rarity, tagged to shop types */
