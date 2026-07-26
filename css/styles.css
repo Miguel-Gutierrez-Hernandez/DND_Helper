@@ -229,7 +229,7 @@ ul.clean li{margin-bottom:3px;}
 .shop-table th,.shop-table td{text-align:left;padding:6px 8px;border-bottom:1px solid rgba(43,32,19,.2);}
 .shop-table th{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);}
 .attack-block{background:rgba(43,32,19,.06);border-left:3px solid var(--ink-soft);padding:8px 12px;margin-bottom:8px;border-radius:0 3px 3px 0;font-size:13.5px;}
-.sheet-actions{display:flex;gap:10px;margin-top:18px;}
+.sheet-actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;}
 .ghost-btn{
   background:transparent;border:1px solid var(--ink-soft);color:var(--ink);
   font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;text-transform:uppercase;

@@ -126,6 +126,8 @@ function pcDataToHtml(data, options = {}) {
   const saveBtn = options.hideSave ? '' : `<button class="ghost-btn" onclick="saveCurrentPC()">Guardar PJ</button>`;
   const regenBtn = options.hideRegen ? '' : `<button class="ghost-btn" onclick="document.getElementById('pc-generate').click()">Regenerar</button>`;
   const deleteBtn = options.showDelete ? `<button class="ghost-btn" onclick="deleteSavedPC('${data.id}').then(refreshSavedList)">Eliminar</button>` : '';
+  const sheetBtn = `<button class="ghost-btn" onclick="downloadCurrentCharacterSheetHTML()">📄 Ficha para el jugador (HTML)</button>`;
+  const jsonBtn = `<button class="ghost-btn" onclick="downloadCurrentPCDataJSON()">⬇ Datos (JSON)</button>`;
   const savedTag = data.savedAt ? `<div class="note-box">Guardado el ${new Date(data.savedAt).toLocaleString('es-ES')}</div>` : '';
 
   let html = `
@@ -193,6 +195,8 @@ function pcDataToHtml(data, options = {}) {
       <div class="sheet-actions">
         ${regenBtn}
         ${saveBtn}
+        ${sheetBtn}
+        ${jsonBtn}
         ${deleteBtn}
       </div>
     </div>

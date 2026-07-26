@@ -165,9 +165,17 @@ async function initUI() {
     });
   });
 
+  document.getElementById('export-json').addEventListener('click', exportAllData);
+
   document.getElementById('import-file').addEventListener('change', e => {
     const file = e.target.files[0];
     if (file) importAllDataFromFile(file);
+  });
+
+  document.getElementById('import-single-pc').addEventListener('change', e => {
+    const file = e.target.files[0];
+    if (file) importSinglePCFile(file);
+    e.target.value = '';
   });
 
   filterSpells();

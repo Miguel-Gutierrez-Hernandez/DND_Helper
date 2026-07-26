@@ -353,9 +353,11 @@
     <section class="panel" id="panel-saved">
       <div class="saved-toolbar">
         <span class="badge" id="saved-backend-badge">Comprobando almacenamiento…</span>
-        <button class="file-btn" id="export-json">Exportar JSON</button>
-        <label class="file-btn">Importar JSON<input type="file" accept="application/json" id="import-file"></label>
+        <button class="file-btn" id="export-json">Exportar todo (JSON)</button>
+        <label class="file-btn">Importar todo (JSON)<input type="file" accept="application/json" id="import-file"></label>
+        <label class="file-btn">Importar un personaje<input type="file" accept="application/json" id="import-single-pc"></label>
       </div>
+      <p class="hint" style="margin:-10px 0 20px;">«Exportar todo» hace una copia de seguridad completa (PNJ, personajes y contenido del Taller). Para compartir un solo personaje con alguien, usa el botón «⬇ Datos (JSON)» de su ficha, o «📄 Ficha para el jugador» si quieres un documento legible y bonito para imprimir o leer fuera de la app.</p>
 
       <div class="saved-columns">
         <div>
@@ -381,6 +383,7 @@
   <script src="js/pc.js"></script>
   <script src="js/monster.js"></script>
   <script src="js/workshop.js"></script>
+  <script src="js/sheetexport.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
