@@ -522,7 +522,80 @@ const RANDOMADJ = ['Oscuro', 'Roto', 'Verdadero', 'Ágil', 'Férreo', 'Siniestro
 const RANDOMNOUN = ['Filo', 'Umbral', 'Eco', 'Cuervo', 'Brasero', 'Vigía', 'Sello', 'Abismo', 'Llama', 'Lobo'];
 const RANDOMTYPES = ['Bestia', 'No muerto', 'Constructo', 'Monstruosidad', 'Aberración', 'Humanoide', 'Fienda', 'Gigante'];
 
-/* ---------- datos compartidos por varios módulos (definidos una sola vez para toda la app) ---------- */
+/* ---------- ganchos de rol para PNJ ---------- */
+const NPC_TRAIT_POOL = [
+  'Habla en susurros, como si todo fuera un secreto.',
+  'Se ríe de sus propios chistes antes de terminarlos.',
+  'Nunca mira a los ojos más de un instante.',
+  'Colecciona objetos pequeños y sin valor «por si acaso».',
+  'Repite la última palabra de cada frase que le dicen.',
+  'Siempre está comiendo o mordisqueando algo.',
+  'Gesticula muchísimo, incluso hablando de cosas triviales.',
+  'Tararea una misma melodía sin darse cuenta.',
+  'Llama «amigo» a todo el mundo, incluso a quien acaba de conocer.',
+  'Se disculpa constantemente, incluso cuando no ha hecho nada malo.',
+  'Cuenta anécdotas larguísimas que nunca vienen a cuento.',
+  'Desconfía de la magia y lo dice en cuanto tiene ocasión.',
+  'Guarda las distancias físicas de forma casi exagerada.',
+  'Tiene una superstición muy concreta que sigue al pie de la letra.',
+  'Habla de sí mismo en tercera persona cuando se pone nervioso.',
+];
+const NPC_IDEAL_POOL = [
+  'Comunidad. Cuidamos de los nuestros antes que de nadie más.',
+  'Justicia. Nadie debería salirse con la suya por tener más poder.',
+  'Libertad. Cada cual decide su propio camino, cueste lo que cueste.',
+  'Conocimiento. Lo que no se sabe, se investiga; lo que se sabe, se comparte.',
+  'Sinceridad. Prefiero una verdad incómoda a una mentira cómoda.',
+  'Ambición. Algún día seré alguien de quien se hable en esta ciudad.',
+  'Tradición. Las costumbres de mis mayores merecen ser respetadas.',
+  'Cambio. Lo viejo debe dar paso a algo mejor, tarde o temprano.',
+  'Lealtad. Quien me ayuda una vez, tiene mi confianza para siempre.',
+  'Supervivencia. Primero yo, luego los míos, después el resto.',
+  'Belleza. El mundo merece cosas hermosas, aunque cuesten caras.',
+  'Equilibrio. Ni demasiado orden ni demasiado caos: el punto medio.',
+];
+const NPC_BOND_POOL = [
+  'Le debe la vida a alguien y aún no ha encontrado forma de pagarlo.',
+  'Ahorra en secreto para sacar a su familia de la pobreza.',
+  'Guarda una carta que nunca ha llegado a enviar.',
+  'Juró proteger este lugar, pase lo que pase.',
+  'Busca a un antiguo compañero de viaje del que perdió el rastro.',
+  'Le debe dinero a alguien peligroso y lo oculta como puede.',
+  'Cría a un familiar que no es hijo suyo, aunque lo trate como tal.',
+  'Conserva un objeto de quien ya no está y no se separa de él.',
+  'Quiere demostrarle algo a alguien que ya no le cree capaz.',
+  'Pertenece en secreto a un gremio o culto del que no habla.',
+  'Espera con ansia la vuelta de alguien que se fue hace años.',
+  'Se siente responsable de una desgracia que ocurrió en el pasado.',
+];
+const NPC_FLAW_POOL = [
+  'No sabe guardar un secreto, por mucho que jure que lo hará.',
+  'Es demasiado orgulloso para pedir ayuda cuando la necesita.',
+  'Le tiene verdadero pánico a algo ridículamente inofensivo.',
+  'Confía en cualquiera que le hable con amabilidad.',
+  'Bebe más de lo que debería cuando algo le preocupa.',
+  'Juzga a la gente por las apariencias, y se equivoca a menudo.',
+  'Es incapaz de resistirse a una apuesta, gane o pierda.',
+  'Guarda rencor durante años por ofensas menores.',
+  'Exagera sus propias hazañas hasta rozar la mentira.',
+  'Se pone celoso con facilidad del éxito ajeno.',
+  'Antepone las ganancias a casi cualquier otra consideración.',
+  'Es incapaz de admitir que se ha equivocado.',
+];
+const NPC_QUOTE_POOL = [
+  '«Aquí no vendemos problemas, solo soluciones. Y algún que otro problema.»',
+  '«Llevo treinta años en este oficio; nada de lo que digas me va a sorprender.»',
+  '«No pregunto de dónde viene el oro. Pregunto si es suficiente.»',
+  '«Como si no tuviera ya bastante con lo mío...»',
+  '«Confía en mí. O no. Pero al menos escúchame.»',
+  '«Aquí todos tenemos un pasado. El mío no es asunto vuestro.»',
+  '«Si venís en son de paz, esta es vuestra casa. Si no... también sabemos recibir.»',
+  '«El tiempo es lo único que no se puede comprar, así que no me lo hagáis perder.»',
+  '«He visto cosas peores que vosotros entrar por esa puerta.»',
+  '«Un consejo gratis: en esta ciudad, nadie es lo que parece.»',
+];
+
+
 const ABILITY_LABEL = { str: 'Fuerza', dex: 'Destreza', con: 'Constitución', int: 'Inteligencia', wis: 'Sabiduría', cha: 'Carisma' };
 const SKILL_ABILITY_MAP = {
   'Acrobacias': 'dex', 'Trato con Animales': 'wis', 'Arcanos': 'int', 'Atletismo': 'str',

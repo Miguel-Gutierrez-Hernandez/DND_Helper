@@ -11,11 +11,13 @@ function activateTab(tab) {
 
 let cachedSavedNPCs = [];
 let cachedSavedPCs = [];
+let cachedPartyIds = [];
 
 function refreshSavedList() {
-  return Promise.all([listSavedNPCs(), listSavedPCs()]).then(([npcItems, pcItems]) => {
+  return Promise.all([listSavedNPCs(), listSavedPCs(), loadPartyIds()]).then(([npcItems, pcItems, partyIds]) => {
     cachedSavedNPCs = npcItems;
     cachedSavedPCs = pcItems;
+    cachedPartyIds = partyIds.filter(id => pcItems.some(p => p.id === id)); // descarta ids de PJ ya borrados
     renderSavedLists();
   });
 }
@@ -43,7 +45,7 @@ function renderSavedLists() {
         </div>
         <div class="saved-card-actions">
           <button class="ghost-btn light" onclick="viewSavedNPC('${n.id}')">Ver</button>
-          <button class="ghost-btn light" onclick="deleteSavedNPC('${n.id}').then(refreshSavedList)">Eliminar</button>
+          <button class="ghost-btn light" onclick="if(confirmAction('¿Eliminar este PNJ? No se puede deshacer.')) deleteSavedNPC('${n.id}').then(refreshSavedList)">Eliminar</button>
         </div>
       </div>
     `).join('')
@@ -56,14 +58,34 @@ function renderSavedLists() {
         <div class="saved-card-main">
           <div class="saved-card-name">${n.name}</div>
           <div class="saved-card-sub">${n.speciesName} ${n.className}${n.subclassName ? ` · ${n.subclassName}` : ''} · Nivel ${n.level}</div>
+          <label class="checkline" style="margin-top:6px;margin-bottom:0;">
+            <input type="checkbox" ${cachedPartyIds.includes(n.id) ? 'checked' : ''} onchange="togglePartyMember('${n.id}')">
+            <span>En el grupo</span>
+          </label>
         </div>
         <div class="saved-card-actions">
           <button class="ghost-btn light" onclick="viewSavedPC('${n.id}')">Ver</button>
-          <button class="ghost-btn light" onclick="deleteSavedPC('${n.id}').then(refreshSavedList)">Eliminar</button>
+          <button class="ghost-btn light" onclick="if(confirmAction('¿Eliminar este personaje? No se puede deshacer.')) deleteSavedPC('${n.id}').then(refreshSavedList)">Eliminar</button>
         </div>
       </div>
     `).join('')
     : `<div class="empty-state">${q ? 'Ningún personaje coincide con la búsqueda.' : 'Ningún personaje guardado todavía.'}</div>`;
+
+  const partySummaryEl = document.getElementById('party-summary');
+  if (partySummaryEl) {
+    const partyPCs = cachedSavedPCs.filter(p => cachedPartyIds.includes(p.id));
+    partySummaryEl.textContent = partyPCs.length
+      ? `Tu grupo: ${partyPCs.length} personaje(s), nivel medio ${Math.round(partyPCs.reduce((s, p) => s + p.level, 0) / partyPCs.length)}.`
+      : 'Todavía no has marcado ningún personaje como parte de tu grupo. Marca la casilla «En el grupo» en los personajes guardados.';
+  }
+}
+
+async function togglePartyMember(id) {
+  const idx = cachedPartyIds.indexOf(id);
+  if (idx >= 0) cachedPartyIds.splice(idx, 1);
+  else cachedPartyIds.push(id);
+  await savePartyIds(cachedPartyIds);
+  renderSavedLists();
 }
 
 async function exportAllData() {
@@ -103,6 +125,22 @@ async function importAllDataFromFile(file) {
   refreshSavedList();
   if (document.getElementById('workshop-monster-list')) refreshWorkshopLists();
   if (typeof filterSpells === 'function') filterSpells();
+}
+
+async function useMyParty() {
+  const ids = await loadPartyIds();
+  if (!ids.length) {
+    alert('Todavía no has marcado ningún personaje como parte de tu grupo. Ve a la pestaña «Guardados» y marca la casilla «En el grupo» en tus personajes.');
+    return;
+  }
+  const allPCs = await listSavedPCs();
+  const partyPCs = allPCs.filter(p => ids.includes(p.id));
+  if (!partyPCs.length) {
+    alert('Los personajes marcados en tu grupo ya no existen (puede que se hayan eliminado). Vuelve a marcarlos en Guardados.');
+    return;
+  }
+  document.getElementById('mon-players').value = partyPCs.length;
+  document.getElementById('mon-level').value = Math.round(partyPCs.reduce((s, p) => s + p.level, 0) / partyPCs.length);
 }
 
 async function populateMonsterSelect() {
@@ -181,6 +219,7 @@ async function initUI() {
 
   document.getElementById('mon-base-search').addEventListener('input', fillMonsterSelectFiltered);
   document.getElementById('mon-mixed-search').addEventListener('input', filterMixedMonsterList);
+  document.getElementById('mon-use-party').addEventListener('click', useMyParty);
 
   document.getElementById('mon-generate').addEventListener('click', () => {
     const mode = document.querySelector('input[name="monmode"]:checked').value;

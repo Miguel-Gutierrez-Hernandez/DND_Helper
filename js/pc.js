@@ -188,7 +188,7 @@ function levelUpPC(oldPc, newLevel) {
 function pcDataToHtml(data, options = {}) {
   const saveBtn = options.hideSave ? '' : `<button class="ghost-btn" onclick="saveCurrentPC()">Guardar PJ</button>`;
   const regenBtn = options.hideRegen ? '' : `<button class="ghost-btn" onclick="document.getElementById('pc-generate').click()">Regenerar</button>`;
-  const deleteBtn = options.showDelete ? `<button class="ghost-btn" onclick="deleteSavedPC('${data.id}').then(refreshSavedList)">Eliminar</button>` : '';
+  const deleteBtn = options.showDelete ? `<button class="ghost-btn" onclick="if(confirmAction('¿Eliminar este personaje? No se puede deshacer.')) deleteSavedPC('${data.id}').then(refreshSavedList)">Eliminar</button>` : '';
   const sheetBtn = `<button class="ghost-btn" onclick="downloadCurrentCharacterSheetHTML()">📄 Ficha para el jugador (HTML)</button>`;
   const jsonBtn = `<button class="ghost-btn" onclick="downloadCurrentPCDataJSON()">⬇ Datos (JSON)</button>`;
   const savedTag = data.savedAt ? `<div class="note-box">Guardado el ${new Date(data.savedAt).toLocaleString('es-ES')}</div>` : '';
@@ -264,7 +264,7 @@ function pcDataToHtml(data, options = {}) {
       ${renderItemPicker('pc-item-picker-select', 'addItemToPC')}
 
       <div class="section-title">Notas</div>
-      <textarea id="pc-notes-field" rows="2" placeholder="Apuntes de campaña (opcional)">${data.notes || ''}</textarea>
+      <textarea id="pc-notes-field" rows="2" placeholder="Apuntes de campaña (opcional)">${escapeHtml(data.notes || '')}</textarea>
       <div class="sheet-actions" style="margin-top:8px;">
         <button class="ghost-btn light" onclick="saveCurrentPCNote()">Guardar nota</button>
       </div>

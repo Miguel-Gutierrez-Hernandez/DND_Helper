@@ -220,12 +220,12 @@ async function refreshWorkshopLists() {
   mEl.innerHTML = monsters.length ? monsters.map(m => `
     <div class="saved-card">
       <div class="saved-card-main">
-        <div class="saved-card-name">${m.name}</div>
-        <div class="saved-card-sub">${m.type} · CR ${m.cr}${m.manual ? ' · estadísticas propias' : ''}${m.multiattack ? ' · multiataque (' + m.multiattack.length + ')' : ''}</div>
+        <div class="saved-card-name">${escapeHtml(m.name)}</div>
+        <div class="saved-card-sub">${escapeHtml(m.type)} · CR ${m.cr}${m.manual ? ' · estadísticas propias' : ''}${m.multiattack ? ' · multiataque (' + m.multiattack.length + ')' : ''}</div>
       </div>
       <div class="saved-card-actions">
         <button class="ghost-btn light" onclick="editCustomMonster('${m.id}')">Editar</button>
-        <button class="ghost-btn light" onclick="deleteCustomMonster('${m.id}').then(async()=>{await refreshCustomMonstersCache();await populateMonsterSelect();refreshWorkshopLists();})">Eliminar</button>
+        <button class="ghost-btn light" onclick="if(confirmAction('¿Eliminar este monstruo del Taller? No se puede deshacer.')) deleteCustomMonster('${m.id}').then(async()=>{await refreshCustomMonstersCache();await populateMonsterSelect();refreshWorkshopLists();})">Eliminar</button>
       </div>
     </div>`).join('') : '<div class="empty-state">Ningún monstruo personalizado todavía.</div>';
 
@@ -233,12 +233,12 @@ async function refreshWorkshopLists() {
   iEl.innerHTML = items.length ? items.map(it => `
     <div class="saved-card">
       <div class="saved-card-main">
-        <div class="saved-card-name">${it.name}</div>
-        <div class="saved-card-sub">${it.type} · ${RARITY_ES_WORKSHOP[it.rarity] || it.rarity}${it.bonus ? ' · ' + it.bonus : ''}</div>
+        <div class="saved-card-name">${escapeHtml(it.name)}</div>
+        <div class="saved-card-sub">${escapeHtml(it.type)} · ${RARITY_ES_WORKSHOP[it.rarity] || it.rarity}${it.bonus ? ' · ' + escapeHtml(it.bonus) : ''}</div>
       </div>
       <div class="saved-card-actions">
         <button class="ghost-btn light" onclick="editCustomItem('${it.id}')">Editar</button>
-        <button class="ghost-btn light" onclick="deleteCustomItem('${it.id}').then(async()=>{await refreshCustomItemsCache();refreshWorkshopLists();})">Eliminar</button>
+        <button class="ghost-btn light" onclick="if(confirmAction('¿Eliminar este objeto del Taller? No se puede deshacer.')) deleteCustomItem('${it.id}').then(async()=>{await refreshCustomItemsCache();refreshWorkshopLists();})">Eliminar</button>
       </div>
     </div>`).join('') : '<div class="empty-state">Ningún objeto personalizado todavía.</div>';
 
@@ -246,12 +246,12 @@ async function refreshWorkshopLists() {
   sEl.innerHTML = spells.length ? spells.map(s => `
     <div class="saved-card">
       <div class="saved-card-main">
-        <div class="saved-card-name">${s.name}</div>
-        <div class="saved-card-sub">Nivel ${s.level}${s.range ? ' · ' + s.range : ''}${s.concentration ? ' · Concentración' : ''}${s.damage ? ' · ' + s.damage : ''}</div>
+        <div class="saved-card-name">${escapeHtml(s.name)}</div>
+        <div class="saved-card-sub">Nivel ${s.level}${s.range ? ' · ' + escapeHtml(s.range) : ''}${s.concentration ? ' · Concentración' : ''}${s.damage ? ' · ' + escapeHtml(s.damage) : ''}</div>
       </div>
       <div class="saved-card-actions">
         <button class="ghost-btn light" onclick="editCustomSpell('${s.id}')">Editar</button>
-        <button class="ghost-btn light" onclick="deleteCustomSpell('${s.id}').then(async()=>{await refreshCustomSpellsCache();refreshWorkshopLists();if(typeof filterSpells==='function')filterSpells();})">Eliminar</button>
+        <button class="ghost-btn light" onclick="if(confirmAction('¿Eliminar este hechizo del Taller? No se puede deshacer.')) deleteCustomSpell('${s.id}').then(async()=>{await refreshCustomSpellsCache();refreshWorkshopLists();if(typeof filterSpells==='function')filterSpells();})">Eliminar</button>
       </div>
     </div>`).join('') : '<div class="empty-state">Ningún hechizo personalizado todavía.</div>';
 }
@@ -262,7 +262,7 @@ function renderItemPicker(pickerId, addFnName) {
   if (!catalog.length) {
     return `<div class="note-box">Aún no tienes objetos en el Taller. Crea uno en la pestaña «Taller» para poder adjuntarlo aquí.</div>`;
   }
-  const options = catalog.map(it => `<option value="${it.id}">${it.name} · ${RARITY_ES_WORKSHOP[it.rarity] || it.rarity}</option>`).join('');
+  const options = catalog.map(it => `<option value="${it.id}">${escapeHtml(it.name)} · ${RARITY_ES_WORKSHOP[it.rarity] || it.rarity}</option>`).join('');
   return `
     <div class="row2" style="align-items:end;">
       <div class="field" style="margin-bottom:0;">
@@ -316,7 +316,7 @@ function itemBonusSummaryLine(items) {
 function renderAttachedItems(items, removeFnName) {
   if (!items || !items.length) return '<div class="note-box">Sin objetos adjuntos todavía.</div>';
   return `<ul class="clean">${items.map((it, idx) => `
-    <li><b>${it.name}</b> (${it.type} · ${RARITY_ES_WORKSHOP[it.rarity] || it.rarity}${it.bonus ? ' · ' + it.bonus : ''}) — ${it.ability}
+    <li><b>${escapeHtml(it.name)}</b> (${escapeHtml(it.type)} · ${RARITY_ES_WORKSHOP[it.rarity] || it.rarity}${it.bonus ? ' · ' + escapeHtml(it.bonus) : ''}) — ${escapeHtml(it.ability)}
       <button class="ghost-btn light" style="margin-left:8px;padding:2px 8px;" onclick="${removeFnName}(${idx})">Quitar</button>
     </li>`).join('')}</ul>`;
 }

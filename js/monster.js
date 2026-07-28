@@ -146,20 +146,20 @@ function attackBlockHtml(mon) {
     return `
       <div class="section-title">Ataque</div>
       <div class="attack-block">
-        <b>${a.name}</b>. ${modStr(a.bonus)} para impactar. Impacto ${a.dmg} de daño.
+        <b>${escapeHtml(a.name)}</b>. ${modStr(a.bonus)} para impactar. Impacto ${a.dmg} de daño.
       </div>`;
   }
   const names = attacks.map(a => a.name);
   const uniqueNames = [...new Set(names)];
   const multiDesc = uniqueNames.length < names.length
-    ? `La criatura realiza ${names.length} ataques de ${uniqueNames.join(' y ')}.`
-    : `La criatura realiza ${names.length} ataques: ${names.join(', ')}.`;
+    ? `La criatura realiza ${names.length} ataques de ${escapeHtml(uniqueNames.join(' y '))}.`
+    : `La criatura realiza ${names.length} ataques: ${escapeHtml(names.join(', '))}.`;
   return `
     <div class="section-title">Multiataque</div>
     <div class="attack-block">${multiDesc}</div>
     ${attacks.map(a => `
       <div class="attack-block">
-        <b>${a.name}</b>. ${modStr(a.bonus)} para impactar. Impacto ${a.dmg} de daño.
+        <b>${escapeHtml(a.name)}</b>. ${modStr(a.bonus)} para impactar. Impacto ${a.dmg} de daño.
       </div>`).join('')}
   `;
 }
@@ -185,8 +185,8 @@ function monsterSheetHtml(mon, extra = '') {
     <div class="sheet">
       <div class="sheet-head">
         <div>
-          <div class="sheet-name">${mon.name}</div>
-          <div class="sheet-sub">${mon.type} · CR ${mon.cr}</div>
+          <div class="sheet-name">${escapeHtml(mon.name)}</div>
+          <div class="sheet-sub">${escapeHtml(mon.type)} · CR ${mon.cr}</div>
         </div>
         <div class="sheet-tag">Monstruo</div>
       </div>
@@ -199,7 +199,7 @@ function monsterSheetHtml(mon, extra = '') {
       </div>
 
       <div class="section-title">Rasgos</div>
-      <ul class="clean">${mon.traits.map(t => `<li>${t}</li>`).join('')}</ul>
+      <ul class="clean">${mon.traits.map(t => `<li>${escapeHtml(t)}</li>`).join('')}</ul>
 
       ${attackBlockHtml(mon)}
 
@@ -288,7 +288,7 @@ function renderMixedMonsterPicker() {
   const all = getAllMonstersMerged();
   el.innerHTML = all.map(m => `
     <div class="mixed-row">
-      <span class="mixed-row-name">${m.name} <span style="opacity:.6;">· CR ${m.cr}${m.custom ? ' · personalizado' : ''}</span></span>
+      <span class="mixed-row-name">${escapeHtml(m.name)} <span style="opacity:.6;">· CR ${m.cr}${m.custom ? ' · personalizado' : ''}</span></span>
       <input type="number" class="mixed-row-qty" data-monster-id="${m.id}" min="0" max="20" value="0">
     </div>`).join('');
 }

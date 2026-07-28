@@ -87,3 +87,14 @@ function fillSelect(el, items, getVal, getLabel, includeRandomFirst = false, ran
     el.appendChild(o);
   });
 }
+
+/* escapa texto antes de insertarlo con innerHTML, imprescindible para todo lo que el usuario
+   escriba a mano (Taller: nombres/descripciones de monstruos, objetos y hechizos personalizados) */
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+/* confirmación genérica antes de una acción destructiva (borrar PNJ/PJ/contenido del Taller) */
+function confirmAction(message) {
+  return confirm(message);
+}

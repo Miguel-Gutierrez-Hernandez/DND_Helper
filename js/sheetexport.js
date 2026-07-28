@@ -1,14 +1,10 @@
 /* ================= FICHA EXPORTABLE (PJ Y PNJ) ================= */
-/* SKILL_ABILITY_MAP y ABILITY_LABEL viven en data.js (compartidas con pc.js) */
+/* SKILL_ABILITY_MAP y ABILITY_LABEL viven en data.js; escapeHtml vive en utils.js (compartidas) */
 
 function slugify(str) {
   return String(str || 'personaje')
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'personaje';
-}
-
-function escapeHtml(str) {
-  return String(str ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 }
 
 function resolveSpellByName(name) {
@@ -249,6 +245,19 @@ function buildNPCSheetDocument(npc) {
     ? `<section class="block"><h2>Notas</h2><p class="muted">${escapeHtml(npc.notes)}</p></section>`
     : '';
 
+  const personalityHtml = npc.personality
+    ? `<section class="block">
+        <h2>Personalidad</h2>
+        <ul class="clean">
+          <li><b>Rasgo:</b> ${escapeHtml(npc.personality.trait)}</li>
+          <li><b>Ideal:</b> ${escapeHtml(npc.personality.ideal)}</li>
+          <li><b>Vínculo:</b> ${escapeHtml(npc.personality.bond)}</li>
+          <li><b>Defecto:</b> ${escapeHtml(npc.personality.flaw)}</li>
+        </ul>
+        <p class="muted" style="font-style:italic;">${escapeHtml(npc.personality.quote)}</p>
+      </section>`
+    : '';
+
   let shopHtml = '';
   if (npc.shopType && npc.shopStock) {
     const { mundane, services, magicItems } = npc.shopStock;
@@ -318,6 +327,8 @@ function buildNPCSheetDocument(npc) {
       ${(npc.skills && npc.skills.length) ? `<p class="muted" style="margin-top:8px;">Habilidades destacadas: ${npc.skills.map(escapeHtml).join(', ')}</p>` : ''}
     </section>
   </div>
+
+  ${personalityHtml}
 
   ${itemsHtml ? `<section class="block"><h2>Objetos</h2>${itemsHtml}</section>` : ''}
 

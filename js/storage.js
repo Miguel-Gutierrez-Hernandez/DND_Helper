@@ -3,7 +3,8 @@ const MEMORYSTORE = {
   pc: [],
   cmonster: [],
   citem: [],
-  cspell: []
+  cspell: [],
+  party: []
 };
 
 let storageBackend = 'memory';
@@ -84,6 +85,14 @@ async function deleteCustomItem(id) { return storeDelete('citem', id); }
 async function saveCustomSpell(d) { return storeSave('cspell', d); }
 async function listCustomSpells() { return storeList('cspell'); }
 async function deleteCustomSpell(id) { return storeDelete('cspell', id); }
+
+/* "Mi grupo": qué personajes guardados forman la party actual, para autorrellenar el generador de monstruos */
+async function savePartyIds(ids) { return storeSave('party', { id: 'main', pcIds: ids, savedAt: Date.now() }); }
+async function loadPartyIds() {
+  const list = await storeList('party');
+  const rec = list.find(p => p.id === 'main');
+  return rec ? rec.pcIds : [];
+}
 
 async function refreshCustomSpellsCache() {
   window.CUSTOMSPELLSCACHE = await listCustomSpells();

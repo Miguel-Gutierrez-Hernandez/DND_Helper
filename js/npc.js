@@ -112,6 +112,13 @@ function buildNPCData(raceId, jobId, partyLevel) {
 
   const atkBonus = Math.max(pb + abilityMod(stats.str), pb + abilityMod(stats.dex));
   const shopStock = job.shop ? buildShopStock(job, partyLevel) : null;
+  const personality = {
+    trait: pick(NPC_TRAIT_POOL),
+    ideal: pick(NPC_IDEAL_POOL),
+    bond: pick(NPC_BOND_POOL),
+    flaw: pick(NPC_FLAW_POOL),
+    quote: pick(NPC_QUOTE_POOL),
+  };
 
   return {
     id: `npc-${Date.now()}-${rnd(100000)}`,
@@ -137,14 +144,15 @@ function buildNPCData(raceId, jobId, partyLevel) {
     partyLevel,
     shopStock,
     items: [],
-    notes: ''
+    notes: '',
+    personality,
   };
 }
 
 function npcDataToHtml(data, options = {}) {
   const saveBtn = options.hideSave ? '' : `<button class="ghost-btn" onclick="saveCurrentNPC()">Guardar PNJ</button>`;
   const regenBtn = options.hideRegen ? '' : `<button class="ghost-btn" onclick="document.getElementById('npc-generate').click()">Regenerar</button>`;
-  const deleteBtn = options.showDelete ? `<button class="ghost-btn" onclick="deleteSavedNPC('${data.id}').then(refreshSavedList)">Eliminar</button>` : '';
+  const deleteBtn = options.showDelete ? `<button class="ghost-btn" onclick="if(confirmAction('¿Eliminar este PNJ? No se puede deshacer.')) deleteSavedNPC('${data.id}').then(refreshSavedList)">Eliminar</button>` : '';
   const sheetBtn = `<button class="ghost-btn" onclick="downloadCurrentNPCSheetHTML()">📄 Ficha (HTML)</button>`;
 
   let html = `
@@ -177,6 +185,15 @@ function npcDataToHtml(data, options = {}) {
       <div class="section-title">Rasgos</div>
       <ul class="clean">${data.traits.map(t => `<li>${t}</li>`).join('')}</ul>
 
+      <div class="section-title">Personalidad</div>
+      <ul class="clean">
+        <li><b>Rasgo:</b> ${data.personality.trait}</li>
+        <li><b>Ideal:</b> ${data.personality.ideal}</li>
+        <li><b>Vínculo:</b> ${data.personality.bond}</li>
+        <li><b>Defecto:</b> ${data.personality.flaw}</li>
+      </ul>
+      <div class="note-box" style="font-style:italic;">${data.personality.quote}</div>
+
       <div class="section-title">Habilidades destacadas</div>
       <div class="chiplist">${data.skills.map(s => `<span class="chip">${s}</span>`).join('')}</div>
 
@@ -194,7 +211,7 @@ function npcDataToHtml(data, options = {}) {
       ${renderItemPicker('npc-item-picker-select', 'addItemToNPC')}
 
       <div class="section-title">Notas del DJ</div>
-      <textarea id="npc-notes-field" rows="2" placeholder="Apuntes para recordar entre sesiones (opcional)">${data.notes || ''}</textarea>
+      <textarea id="npc-notes-field" rows="2" placeholder="Apuntes para recordar entre sesiones (opcional)">${escapeHtml(data.notes || '')}</textarea>
       <div class="sheet-actions" style="margin-top:8px;">
         <button class="ghost-btn light" onclick="saveCurrentNPCNote()">Guardar nota</button>
       </div>
