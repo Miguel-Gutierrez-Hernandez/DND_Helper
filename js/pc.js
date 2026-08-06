@@ -190,6 +190,7 @@ function pcDataToHtml(data, options = {}) {
   const regenBtn = options.hideRegen ? '' : `<button class="ghost-btn" onclick="document.getElementById('pc-generate').click()">Regenerar</button>`;
   const deleteBtn = options.showDelete ? `<button class="ghost-btn" onclick="if(confirmAction('¿Eliminar este personaje? No se puede deshacer.')) deleteSavedPC('${data.id}').then(refreshSavedList)">Eliminar</button>` : '';
   const sheetBtn = `<button class="ghost-btn" onclick="downloadCurrentCharacterSheetHTML()">📄 Ficha para el jugador (HTML)</button>`;
+  const pdfBtn = `<button class="ghost-btn" onclick="downloadCurrentPCPdfSheet()">📄 Ficha oficial (PDF)</button>`;
   const jsonBtn = `<button class="ghost-btn" onclick="downloadCurrentPCDataJSON()">⬇ Datos (JSON)</button>`;
   const savedTag = data.savedAt ? `<div class="note-box">Guardado el ${new Date(data.savedAt).toLocaleString('es-ES')}</div>` : '';
 
@@ -284,6 +285,7 @@ function pcDataToHtml(data, options = {}) {
         ${regenBtn}
         ${saveBtn}
         ${sheetBtn}
+        ${pdfBtn}
         ${jsonBtn}
         ${deleteBtn}
       </div>
@@ -305,6 +307,8 @@ async function saveCurrentPC() {
   await savePCData(lastPCData);
   document.getElementById('pc-result').innerHTML = pcDataToHtml(lastPCData, { hideSave: true });
   refreshSavedList();
+  // guarda también la hoja de personaje oficial en PDF, rellena con los datos del PJ
+  await downloadCurrentPCPdfSheet();
 }
 
 async function saveCurrentPCNote() {
